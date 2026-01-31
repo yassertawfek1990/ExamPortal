@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Class Manager</title>
+  <style>
+    iframe { display: none; }
+    /* RESET */
+* {
+  box-sizing: border-box;
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* PAGE */
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  padding: 5px 10px;
+}
+/* Navigation Bar Styles */
+      .navbar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        background-color: var(--nav-bg);
+        box-shadow: var(--nav-shadow);
+        z-index: 1000;
+        padding: 0 20px;
+      }
+
+      .nav-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0 20px;
+      }
+
+      .logo {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        color: var(--primary-color);
+        font-weight: bold;
+        font-size: 1.2rem;
+      }
+
+      .logo-icon {
+        background-color: var(--primary-color);
+        color: white;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 5px;
+        list-style: none;
+      }
+
+      .nav-links a {
+        color: var(--text-color);
+        text-decoration: none;
+        padding: 12px 18px;
+        border-radius: var(--border-radius);
+        transition: all 0.3s ease;
+        font-weight: 500;
+        white-space: nowrap;
+      }
+
+      .nav-links a:hover {
+        background-color: #71798f;
+        color: var(--primary-color);
+      }
+
+      .nav-links a.active {
+        background-color: var(--primary-color);
+        color: rgb(112, 105, 105);
+      }
+
+      .hamburger {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+        gap: 4px;
+        padding: 10px;
+      }
+
+      .hamburger span {
+        width: 25px;
+        height: 3px;
+        background-color: var(--text-color);
+        border-radius: 2px;
+        transition: 0.3s;
+      }
+
+/* CARD */
+.container {
+  width: 100%;
+  max-width: 480px;
+  background: #111827;
+  border-radius: 14px;
+  padding: 28px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+/* TITLE */
+h1 {
+  margin: 0 0 8px;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.subtitle {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #9ca3af;
+  margin-bottom: 24px;
+}
+
+/* FORM */
+label {
+  font-size: 0.85rem;
+  color: #d1d5db;
+  display: block;
+  margin-bottom: 6px;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #374151;
+  background: #1f2933;
+  color: #fff;
+  outline: none;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.4);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 110px;
+}
+
+/* BUTTON */
+button {
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 25px rgba(59, 130, 246, 0.5);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* STATUS */
+.status {
+  margin-top: 16px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.status.success {
+  color: #22c55e;
+}
+
+.status.error {
+  color: #ef4444;
+}
+
+/* FOOTER */
+.footer {
+  margin-top: 22px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+  </style>
+</head>
+<body>
+<!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="nav-container">
+        <a href="#" class="logo">
+          <div class="logo-icon">UPC</div>
+          <span>Exams Portal</span>
+        </a>
+        
+        <div class="hamburger" id="hamburger">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+        
+        <ul class="nav-links" id="navLinks">
+       <li><a href="createExam.html">Create Exam</a></li>
+          <li><a href="OpenExam.html">Open Exam</a></li>
+          <li><a href="quizBoard.html" >Results Board</a></li>
+          <li><a href="newWave.html" class="active">Add Wave</a></li>
+          <li><a href="exam.html" >Take Exam</a></li>
+        </ul>
+      </div>
+    </nav>
+<h2>Wave Name</h2>
+
+<input id="className" placeholder="e.g., Wave1, Wave2" required><br><br>
+
+<h2>Emails</h2>
+
+<textarea id="emails" rows="6" placeholder="Enter one email per line:
+student1@example.com
+student2@example.com
+student3@example.com" required></textarea><br><br>
+
+<button onclick="submitClass()">Create Wave Sheet</button>
+
+<p id="status"></p>
+
+<iframe id="hiddenFrame"></iframe>
+
+<script>
+     // Mobile menu toggle
+      const hamburger = document.getElementById('hamburger');
+      const navLinks = document.getElementById('navLinks');
+
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navLinks.classList.toggle('active');
+      });
+
+      // Close mobile menu when clicking outside
+      document.addEventListener('click', (e) => {
+        if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+          hamburger.classList.remove('active');
+          navLinks.classList.remove('active');
+        }
+      });
+
+      // Close mobile menu when clicking a link
+      document.querySelectorAll('.nav-links a').forEach(link => {
+        link.addEventListener('click', () => {
+          hamburger.classList.remove('active');
+          navLinks.classList.remove('active');
+        });
+      });
+// const SCRIPT_URL =
+//   "https://script.google.com/macros/s/AKfycbz8OMA8SQaHhlIUbwI7d1E3VAu4ALeFOZ272xI5S0UshBWwLgHs1wRV2e26vGn0zz6W/exec";
+
+  const SCRIPT_URL =
+  "https://script.google.com/macros/s/AKfycbxqpEdO5m-CKA5XuzG5kRrvEPqQPXCD9uCOtc6FCZMii0iKwAVoEFqN-IS4NJXgCAgMdw/exec";
+function submitClass() {
+  const className = document.getElementById("className").value.trim();
+  const emails = document.getElementById("emails").value
+    .split("\n").map(e => e.trim()).filter(Boolean);
+
+  if (!className || emails.length === 0) {
+    alert("Missing data");
+    return;
+  }
+
+  document.getElementById("status").innerText = "Creating sheet...";
+
+  const url =
+    SCRIPT_URL +
+    "?className=" + encodeURIComponent(className) +
+    "&emails=" + encodeURIComponent(JSON.stringify(emails));
+
+  // 👇 background call
+  document.getElementById("hiddenFrame").src = url;
+
+  // optimistic UX
+  setTimeout(() => {
+    document.getElementById("status").innerText = "✅ Wave created";
+  }, 1500);
+}
+</script>
+
+</body>
+</html>
