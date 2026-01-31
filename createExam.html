@@ -115,6 +115,7 @@
       border-radius: 8px;
       margin-bottom: 20px;
       border: 1px solid #e1e7ff;
+      position: relative;
     }
     
     .image-preview {
@@ -218,6 +219,49 @@
       margin-bottom: 5px;
       display: block;
     }
+    
+    .disabled-input {
+      background-color: #f5f5f5;
+      color: #666;
+      cursor: not-allowed;
+      border: 1px solid #ddd;
+    }
+    
+    .quiz-meta-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4a6bff;
+      font-size: 14px;
+    }
+    
+    .quiz-meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    
+    .quiz-meta-label {
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .quiz-meta-value {
+      color: #333;
+    }
+    
+    .question-time {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 12px;
+      color: #666;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid #e1e7ff;
+    }
   </style>
 </head>
 <body>
@@ -240,7 +284,7 @@
         <li><a href="OpenExam.html">Open Exam</a></li>
         <li><a href="quizBoard.html">Results Board</a></li>
         <li><a href="newWave.html">Add Wave</a></li>
-        <li><a href="https://yassertawfek1990.github.io/UPC_QUIZ/">Take Exam</a></li>
+        <li><a href="exam.html">Take Exam</a></li>
       </ul>
     </div>
   </nav>
@@ -251,6 +295,17 @@
     <select id="existingQuizzes"></select>
     
     <form id="quizForm">
+      <div id="quizMetaInfo" class="quiz-meta-info" style="display: none;">
+        <div class="quiz-meta-row">
+          <span class="quiz-meta-label">Created:</span>
+          <span class="quiz-meta-value" id="createdAtValue">-</span>
+        </div>
+        <div class="quiz-meta-row">
+          <span class="quiz-meta-label">Last Updated:</span>
+          <span class="quiz-meta-value" id="updatedAtValue">-</span>
+        </div>
+      </div>
+      
       <div class="form-row">
         <div>
           <div class="section-title">Quiz Title</div>
@@ -328,7 +383,7 @@
       });
     });
     
-    /* ================== CONFIG ================== */
+  /* ================== CONFIG ================== */
     const QUIZ_API = 'https://script.google.com/macros/s/AKfycbyxtQFMyq_M2fnEgUdk8x95QIXrRSBUIZ-DrIuah1FaiXVWAcV__wIkhQ9jFDy7Ip55/exec';
     const QUIZ_SHEET = 'https://opensheet.elk.sh/1zq1ei3A6LcuUPp77WLl8hiP2MCdTHfbV2ScMF2cvzu0/';
     const BANK_URL = 'https://opensheet.elk.sh/1Kp_2eyq6hcLe_mmhNfOwSQgBYPFG6U9oZKDf6jfMFqI/mcq';
@@ -338,6 +393,7 @@
     let bank = [];
     let wavesList = [];
     let currentQuizTitle = '';
+    let currentQuizCreatedAt = '';
     
     /* ================== INITIALIZATION ================== */
     window.onload = async () => {
@@ -360,7 +416,44 @@
         const select = document.getElementById('existingQuizzes');
         select.innerHTML = '<option value="">-- Create New Quiz --</option>';
         titles.forEach(t => {
-          select.innerHTML += `<option value="${t.Title}">${t.Title} (${t.Wave || 'All'})</option>`;
+          const createdAt = t.Created_at ? formatDate(t.Created_at, 'short') : 'Unknown date';
+          console.log(createdAt)
+          const status = t.Status || 'inactive';
+          const wave = t.Wave || 'All';
+          const timer = t.Timer || '15';
+          
+        //   select.innerHTML += `<option value="${t.Title}" 
+        //     data-created="${t.Created_at || ''}"
+        //     data-status="${status}"
+        //     data-wave="${wave}"
+        //     data-timer="${timer}">
+        //     ${t.Title} (${wave}) - ${status} - Created: ${createdAt}
+        //   </option>`;
+//         select.innerHTML += `
+//   <option value="${t.Title}"
+//     data-created="${t.Created_at || ''}"
+//     data-status="${status}"
+//     data-wave="${wave}"
+//     data-timer="${timer}">
+//     📘 ${t.Title}
+//     │ 🌊 ${wave}
+//     │ 🔘 ${status}
+//     │ 🕒 ${createdAt}
+//   </option>
+// `;
+select.innerHTML += `
+  <option value="${t.Title}"
+    data-created="${t.Created_at || ''}"
+    data-status="${status}"
+    data-wave="${wave}"
+    data-timer="${timer}">
+     ${t.Title}
+    │ 🌊 ${wave}
+    │ 🔘 ${status}
+    │ 🕒 ${createdAt}
+  </option>
+`;
+
         });
       } catch (error) {
         console.error('Error loading quizzes:', error);
@@ -537,7 +630,16 @@
       div.dataset.id = q.ID || '';
       div.dataset.bankSerial = q.Quiz_Bank_serial || ''; // Store bank serial in dataset
       
+      // TimeAdded display
+      const timeAddedDisplay = q.TimeAdded ? `
+        <div class="question-time">
+          Added: ${formatDate(q.TimeAdded, 'short')}
+        </div>
+      ` : '';
+      
       div.innerHTML = `
+        ${timeAddedDisplay}
+        
         <div style="margin-bottom: 15px;">
           <div class="section-title">Question</div>
           <textarea name="question" placeholder="Enter your question here..." rows="2" required>${q.Question || ''}</textarea>
@@ -604,7 +706,6 @@
             🗑 Delete
           </button>
         </div>
-        ${q.TimeAdded ? `<small style="color:#666;display:block;margin-top:10px;">Added: ${formatDate(q.TimeAdded)}</small>` : ''}
       `;
       
       document.getElementById('questions').appendChild(div);
@@ -675,6 +776,7 @@
     /* ================== QUIZ LOADING ================== */
     document.getElementById('existingQuizzes').onchange = async function() {
       const title = this.value;
+      const selectedOption = this.options[this.selectedIndex];
       
       if (!title) {
         resetForm();
@@ -694,7 +796,17 @@
         }
         
         currentQuizTitle = title;
+        currentQuizCreatedAt = quizDetails.Created_at || '';
         document.getElementById('questions').innerHTML = '';
+        
+        // Show quiz metadata
+        const metaInfo = document.getElementById('quizMetaInfo');
+        metaInfo.style.display = 'block';
+        document.getElementById('createdAtValue').textContent = 
+          currentQuizCreatedAt ? formatDate(currentQuizCreatedAt, 'full') : 'Not recorded';
+        
+        // Update Last Updated time
+        document.getElementById('updatedAtValue').textContent = formatDate(new Date(), 'full');
         
         // Set basic fields
         document.querySelector('[name=title]').value = quizDetails.Title;
@@ -822,6 +934,7 @@
         timer: timer,
         status: status,
         wave: wave,
+        created_at: currentQuizCreatedAt, // Pass existing Created_at if it exists
         questions: questions
       };
       
@@ -841,6 +954,9 @@
           msg(`✅ Quiz "${title}" saved successfully!`, 'success');
           await loadQuizzes();
           
+          // Update Last Updated time
+          document.getElementById('updatedAtValue').textContent = formatDate(new Date(), 'full');
+          
           if (currentQuizTitle !== title) {
             setTimeout(() => location.reload(), 1500);
           }
@@ -856,22 +972,73 @@
     /* ================== UTILITY FUNCTIONS ================== */
     function resetForm() {
       currentQuizTitle = '';
+      currentQuizCreatedAt = '';
       document.getElementById('questions').innerHTML = '';
       document.getElementById('quizForm').reset();
+      document.getElementById('quizMetaInfo').style.display = 'none';
       selectWavesFromString('All');
       addQuestion();
       msg('Ready to create new quiz', 'info');
     }
     
-    function formatDate(dateString) {
+    function formatDate(dateString, format = 'short') {
       if (!dateString) return '';
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        month: 'short',
-        day: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-      });
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          // If dateString is invalid, try to parse it
+          const parsedDate = new Date(dateString.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3'));
+          if (isNaN(parsedDate.getTime())) {
+            return dateString; // Return original if still invalid
+          }
+          return formatDateObject(parsedDate, format);
+        }
+        return formatDateObject(date, format);
+      } catch (e) {
+        return dateString; // Return original if parsing fails
+      }
+    }
+    
+    function formatDateObject(date, format) {
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      
+      switch(format) {
+        case 'short':
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        case 'full':
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+        case 'relative':
+          if (isToday) {
+            return `Today at ${date.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}`;
+          }
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        default:
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+      }
     }
     
     function msg(text, type = 'info') {
@@ -907,5 +1074,4 @@
     }
   </script>
 </body>
-
 </html>
