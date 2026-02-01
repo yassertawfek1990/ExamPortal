@@ -1104,7 +1104,7 @@
         } else if (score === total) {
           wrongAnswersHTML = '<span style="color: var(--success);">Perfect!</span>';
         }
-        
+        //   <td>${item.Mobile ? `<span class="mobile-badge">${item.Mobile}</span>` : 'N/A'}</td>
         return `
           <tr>
             <td>${formatTimestamp(item.Timestamp)}</td>
@@ -1116,7 +1116,7 @@
             <td class="wrong-answers">${wrongAnswersHTML}</td>
             <td class="duration-cell">${formatDuration(duration)}</td>
             <td>${formatTimestamp(item['Time of Submission'])}</td>
-            <td>${item.Mobile ? `<span class="mobile-badge">${item.Mobile}</span>` : 'N/A'}</td>
+         
           </tr>
         `;
       }));
