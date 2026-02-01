@@ -6,142 +6,142 @@
     body {
       font-family: Segoe UI, sans-serif;
       background: #f4f6ff;
-      max-width: 900px;
+      max-width: 1000px;
       margin: auto;
       padding: 20px;
-      display: flex;
-      flex-direction: column;
     }
+
     /* Navigation Bar Styles */
-      /* .navbar {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        background-color: var(--nav-bg);
-        box-shadow: var(--nav-shadow);
-        z-index: 1000;
-        padding: 0 20px;
-      } */
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
 
-      .nav-container {
-        max-width: 1200px;
-        margin: 0 auto;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 0 20px;
-      }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: #4a6bff;
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
 
-      .logo {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        text-decoration: none;
-        color: var(--primary-color);
-        font-weight: bold;
-        font-size: 1.2rem;
-      }
+    .nav-links {
+      display: flex;
+      gap: 5px;
+      list-style: none;
+    }
 
-      .logo-icon {
-        background-color: var(--primary-color);
-        color: white;
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        font-size: 1.1rem;
-      }
+    .nav-links a {
+      color: #333;
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      white-space: nowrap;
+    }
 
-      .nav-links {
-        display: flex;
-        gap: 5px;
-        list-style: none;
-      }
+    .nav-links a:hover {
+      background-color: #e8eeff;
+      color: #4a6bff;
+    }
 
-      .nav-links a {
-        color: var(--text-color);
-        text-decoration: none;
-        padding: 12px 18px;
-        border-radius: var(--border-radius);
-        transition: all 0.3s ease;
-        font-weight: 500;
-        white-space: nowrap;
-      }
+    .nav-links a.active {
+      background-color: #4a6bff;
+      color: white;
+    }
+    
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+      gap: 4px;
+      padding: 10px;
+    }
 
-     .nav-links a:hover {
-        background-color: #71798f;
-        color: var(--primary-color);
-      }
-
-      .nav-links a.active {
-        background-color: var(--primary-color);
-        color: rgb(112, 105, 105);
-      }
-      .hamburger {
-        display: none;
-        flex-direction: column;
-        cursor: pointer;
-        gap: 4px;
-        padding: 10px;
-      }
-
-      .hamburger span {
-        width: 25px;
-        height: 3px;
-        background-color: var(--text-color);
-        border-radius: 2px;
-        transition: 0.3s;
-      }
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #333;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
 
     .card {
       background: #fff;
-      padding: 20px;
+      padding: 25px;
       border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,.1);
+      box-shadow: 0 4px 15px rgba(0,0,0,.1);
+      margin-top: 20px;
     }
-    input, select {
+    
+    input, select, textarea {
       width: 100%;
       padding: 10px;
       margin-bottom: 8px;
       box-sizing: border-box;
+      border: 1px solid #ddd;
+      border-radius: 6px;
     }
+    
     .form-row {
       display: flex;
-      gap: 10px;
-      margin-bottom: 15px;
+      gap: 15px;
+      margin-bottom: 20px;
     }
+    
     .form-row > * {
       flex: 1;
     }
+    
     button {
-      padding: 8px 14px;
+      padding: 10px 16px;
       border: none;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
+      transition: all 0.2s;
     }
+    
     .question-section {
-      background: #f1f3ff;
-      padding: 15px;
+      background: #f8faff;
+      padding: 20px;
       border-radius: 8px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      border: 1px solid #e1e7ff;
+      position: relative;
     }
+    
+    .image-preview {
+      max-width: 200px;
+      max-height: 150px;
+      margin-top: 5px;
+      display: none;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+    }
+    
     .bank {
       display: flex;
       gap: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
     }
+    
     #msg {
       text-align: center;
       font-weight: bold;
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 5px;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 6px;
+      display: none;
     }
+    
     .wave-pill {
       background: #f0f0f0;
       color: #333;
@@ -152,565 +152,926 @@
       font-weight: 500;
       transition: all 0.2s;
     }
+    
     .wave-pill.active {
       background: #4a6bff !important;
       color: white !important;
       border-color: #4a6bff !important;
     }
+    
     .section-title {
       font-weight: 600;
       margin-bottom: 8px;
       color: #333;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #eee;
+      margin-left: 10px;
+    }
+    
+    .option-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    
+    .image-link-container {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 5px;
+    }
+    
+    .image-link-container input {
+      flex: 1;
+      margin-bottom: 0;
+    }
+    
+    .preview-btn {
+      background: #6c757d;
+      color: white;
+      padding: 8px 12px;
+      font-size: 0.9em;
+    }
+    
+    .preview-btn:hover {
+      background: #5a6268;
+    }
+    
+    .image-hint {
+      font-size: 12px;
+      color: #666;
+      margin-top: 2px;
+      margin-bottom: 8px;
+    }
+    
+    .option-label {
+      font-weight: 500;
+      color: #444;
+      margin-bottom: 5px;
+      display: block;
+    }
+    
+    .disabled-input {
+      background-color: #f5f5f5;
+      color: #666;
+      cursor: not-allowed;
+      border: 1px solid #ddd;
+    }
+    
+    .quiz-meta-info {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 20px;
+      border-left: 4px solid #4a6bff;
+      font-size: 14px;
+    }
+    
+    .quiz-meta-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 5px;
+    }
+    
+    .quiz-meta-label {
+      font-weight: 600;
+      color: #555;
+    }
+    
+    .quiz-meta-value {
+      color: #333;
+    }
+    
+    .question-time {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 12px;
+      color: #666;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 3px 8px;
+      border-radius: 12px;
+      border: 1px solid #e1e7ff;
     }
   </style>
 </head>
 <body>
   <!-- Navigation Bar -->
-    <nav class="navbar">
-      <div class="nav-container">
-        <a href="#" class="logo">
-          <div >UPC</div>
-          <span>Exams Portal</span>
-        </a>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div>UPC</div>
+        <span>Exams Portal</span>
+      </a>
+      
+      <div class="hamburger" id="hamburger">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      
+      <ul class="nav-links" id="navLinks">
+        <li><a href="createExam.html" >Create Exam</a></li>
+        <li><a href="OpenExam.html" class="active">Open Exam</a></li>
+        <li><a href="index.html">Results Board</a></li>
+        <li><a href="newWave.html">Add Wave</a></li>
+        <li><a href="https://yassertawfek1990.github.io/UPC_QUIZ/">Take Exam</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="card">
+    <h2>Create / Edit Quiz</h2>
+    
+    <select id="existingQuizzes"></select>
+    
+    <form id="quizForm">
+      <div id="quizMetaInfo" class="quiz-meta-info" style="display: none;">
+        <div class="quiz-meta-row">
+          <span class="quiz-meta-label">Created:</span>
+          <span class="quiz-meta-value" id="createdAtValue">-</span>
+        </div>
+        <div class="quiz-meta-row">
+          <span class="quiz-meta-label">Last Updated:</span>
+          <span class="quiz-meta-value" id="updatedAtValue">-</span>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div>
+          <div class="section-title">Quiz Title</div>
+          <input name="title" placeholder="Enter quiz title" required>
+        </div>
+        <div>
+          <div class="section-title">Time Limit (minutes)</div>
+          <input name="timer" type="number" min="1" placeholder="e.g., 15" required>
+        </div>
+      </div>
+      
+      <div class="form-row">
+        <div>
+          <div class="section-title">Status</div>
+          <select name="status" required>
+            <option value="">-- Select Status --</option>
+            <option value="active">Active</option>
+            <option value="inactive">Inactive</option>
+          </select>
+        </div>
+        <div>
+          <div class="section-title">Waves</div>
+          <div id="waveContainer"></div>
+          <input type="hidden" name="wave" id="waveHidden" value="All">
+        </div>
+      </div>
+      
+      <div style="display: none;">
+        <div class="section-title">Question Bank</div>
+        <div class="bank">
+          <input id="serial" placeholder="Enter question serial number">
+          <button type="button" onclick="loadFromBank()" style="background:#6c757d;color:white;">📚 Load from Bank</button>
+        </div>
+      </div>
+      
+      <div style="display: none;">
+        <div class="section-title">Questions</div>
+        <div id="questions"></div>
+        <button type="button" onclick="addQuestion()" style="background:#4caf50;color:#fff;width:100%;margin-top:15px;padding:12px;">
+          ➕ Add New Question
+        </button>
+      </div>
+      
+      <div style="display: flex; gap: 10px; margin-top: 30px;">
+        <button type="submit" style="background:#4a6bff;color:#fff;flex:1;padding:14px;font-size:16px;">
+          💾 Save Quiz
+        </button>
+      </div>
+    </form>
+    
+    <p id="msg"></p>
+  </div>
+
+  <script>
+    // Mobile menu toggle
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('navLinks');
+    
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+    
+    document.addEventListener('click', (e) => {
+      if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
+    
+    document.querySelectorAll('.nav-links a').forEach(link => {
+      link.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+      });
+    });
+    
+  /* ================== CONFIG ================== */
+    const QUIZ_API = 'https://script.google.com/macros/s/AKfycbyxtQFMyq_M2fnEgUdk8x95QIXrRSBUIZ-DrIuah1FaiXVWAcV__wIkhQ9jFDy7Ip55/exec';
+    const QUIZ_SHEET = 'https://opensheet.elk.sh/1zq1ei3A6LcuUPp77WLl8hiP2MCdTHfbV2ScMF2cvzu0/';
+    const BANK_URL = 'https://opensheet.elk.sh/1Kp_2eyq6hcLe_mmhNfOwSQgBYPFG6U9oZKDf6jfMFqI/mcq';
+    const WAVES_URL = 'https://opensheet.elk.sh/1BfUO480KG_5RtpmPqi-NzIVi6rYlBqOcT15WTlcSNlc/All';
+    
+    /* ================== STATE ================== */
+    let bank = [];
+    let wavesList = [];
+    let currentQuizTitle = '';
+    let currentQuizCreatedAt = '';
+    
+    /* ================== INITIALIZATION ================== */
+    window.onload = async () => {
+      try {
+        await loadQuizzes();
+        await loadWaves();
+        bank = await (await fetch(BANK_URL)).json();
+        addQuestion();
+        msg('System ready. Select waves by clicking on them.', 'info');
+      } catch (error) {
+        console.error('Initialization error:', error);
+        msg('Error loading data. Please refresh.', 'error');
+      }
+    };
+    
+    /* ================== LOAD QUIZZES ================== */
+    async function loadQuizzes() {
+      try {
+        const titles = await (await fetch(`${QUIZ_SHEET}Titles`)).json();
+        const select = document.getElementById('existingQuizzes');
+        select.innerHTML = '<option value="">-- Create New Quiz --</option>';
+        titles.forEach(t => {
+          const createdAt = t.Created_at ? formatDate(t.Created_at, 'short') : 'Unknown date';
+          console.log(createdAt)
+          const status = t.Status || 'inactive';
+          const wave = t.Wave || 'All';
+          const timer = t.Timer || '15';
+          
+        //   select.innerHTML += `<option value="${t.Title}" 
+        //     data-created="${t.Created_at || ''}"
+        //     data-status="${status}"
+        //     data-wave="${wave}"
+        //     data-timer="${timer}">
+        //     ${t.Title} (${wave}) - ${status} - Created: ${createdAt}
+        //   </option>`;
+//         select.innerHTML += `
+//   <option value="${t.Title}"
+//     data-created="${t.Created_at || ''}"
+//     data-status="${status}"
+//     data-wave="${wave}"
+//     data-timer="${timer}">
+//     📘 ${t.Title}
+//     │ 🌊 ${wave}
+//     │ 🔘 ${status}
+//     │ 🕒 ${createdAt}
+//   </option>
+// `;
+select.innerHTML += `
+  <option value="${t.Title}"
+    data-created="${t.Created_at || ''}"
+    data-status="${status}"
+    data-wave="${wave}"
+    data-timer="${timer}">
+     ${t.Title}
+    │ 🌊 ${wave}
+    │ 🔘 ${status}
+    │ 🕒 ${createdAt}
+  </option>
+`;
+
+        });
+      } catch (error) {
+        console.error('Error loading quizzes:', error);
+      }
+    }
+    
+    /* ================== WAVE SELECTION (PILL BUTTONS) ================== */
+    async function loadWaves() {
+      try {
+        wavesList = await (await fetch(WAVES_URL)).json();
+        setupWavePills();
+      } catch (error) {
+        console.error('Error loading waves:', error);
+        wavesList = [{Waves: 'All'}];
+        setupWavePills();
+      }
+    }
+    
+    function setupWavePills() {
+      const container = document.getElementById('waveContainer');
+      container.innerHTML = `
+        <div id="wavePills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+        <div style="color:#666;font-size:14px;margin-bottom:8px;">
+          Click to select waves. <span id="selectedCount">(1 selected)</span>
+        </div>
+        <div id="waveSearch" style="margin-top:5px;">
+          <input type="text" placeholder="Search waves..." 
+                 style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"
+                 oninput="filterWaves(this.value)">
+        </div>
+      `;
+      
+      // Add "All" pill
+      const wavePillsDiv = document.getElementById('wavePills');
+      const allPill = document.createElement('button');
+      allPill.type = 'button';
+      allPill.className = 'wave-pill active';
+      allPill.dataset.wave = 'All';
+      allPill.textContent = 'All';
+      allPill.onclick = () => selectWavePill('All');
+      allPill.onmouseenter = () => {
+        if (!allPill.classList.contains('active')) allPill.style.borderColor = '#4a6bff';
+      };
+      allPill.onmouseleave = () => {
+        if (!allPill.classList.contains('active')) allPill.style.borderColor = '#ddd';
+      };
+      wavePillsDiv.appendChild(allPill);
+      
+      // Add wave pills from sheet
+      wavesList.forEach(waveObj => {
+        const waveName = waveObj.Waves;
+        if (waveName && waveName !== 'All') {
+          const pill = document.createElement('button');
+          pill.type = 'button';
+          pill.className = 'wave-pill';
+          pill.dataset.wave = waveName;
+          pill.textContent = waveName;
+          pill.onclick = () => selectWavePill(waveName);
+          pill.onmouseenter = () => {
+            if (!pill.classList.contains('active')) {
+              pill.style.borderColor = '#4a6bff';
+              pill.style.background = '#e8eeff';
+            }
+          };
+          pill.onmouseleave = () => {
+            if (!pill.classList.contains('active')) {
+              pill.style.borderColor = '#ddd';
+              pill.style.background = '#f0f0f0';
+            }
+          };
+          wavePillsDiv.appendChild(pill);
+        }
+      });
+      
+      updateSelectedCount();
+    }
+    
+    function selectWavePill(waveName) {
+      const pills = document.querySelectorAll('.wave-pill');
+      const hiddenInput = document.getElementById('waveHidden');
+      
+      if (waveName === 'All') {
+        // Select only "All"
+        pills.forEach(pill => {
+          const isAll = pill.dataset.wave === 'All';
+          pill.classList.toggle('active', isAll);
+          pill.style.background = isAll ? '#4a6bff' : '#f0f0f0';
+          pill.style.color = isAll ? 'white' : '#333';
+          pill.style.borderColor = isAll ? '#4a6bff' : '#ddd';
+        });
+        hiddenInput.value = 'All';
+      } else {
+        // Toggle specific wave
+        const allPill = document.querySelector('.wave-pill[data-wave="All"]');
+        allPill.classList.remove('active');
+        allPill.style.background = '#f0f0f0';
+        allPill.style.color = '#333';
+        allPill.style.borderColor = '#ddd';
         
-        <div class="hamburger" id="hamburger">
-          <span></span>
-          <span></span>
-          <span></span>
+        const clickedPill = document.querySelector(`.wave-pill[data-wave="${waveName}"]`);
+        clickedPill.classList.toggle('active');
+        clickedPill.style.background = clickedPill.classList.contains('active') ? '#4a6bff' : '#f0f0f0';
+        clickedPill.style.color = clickedPill.classList.contains('active') ? 'white' : '#333';
+        clickedPill.style.borderColor = clickedPill.classList.contains('active') ? '#4a6bff' : '#ddd';
+        
+        // Update hidden value
+        const selectedPills = document.querySelectorAll('.wave-pill.active');
+        if (selectedPills.length === 0) {
+          hiddenInput.value = 'All';
+          allPill.classList.add('active');
+          allPill.style.background = '#4a6bff';
+          allPill.style.color = 'white';
+          allPill.style.borderColor = '#4a6bff';
+        } else {
+          hiddenInput.value = Array.from(selectedPills).map(p => p.dataset.wave).join(',');
+        }
+      }
+      
+      updateSelectedCount();
+    }
+    
+    function filterWaves(searchTerm) {
+      const pills = document.querySelectorAll('.wave-pill:not([data-wave="All"])');
+      const lowerSearch = searchTerm.toLowerCase();
+      pills.forEach(pill => {
+        pill.style.display = pill.dataset.wave.toLowerCase().includes(lowerSearch) || !searchTerm ? 'inline-block' : 'none';
+      });
+    }
+    
+    function updateSelectedCount() {
+      const count = document.querySelectorAll('.wave-pill.active').length;
+      document.getElementById('selectedCount').textContent = `(${count} selected)`;
+    }
+    
+    function selectWavesFromString(waveString) {
+      const waves = (waveString || 'All').split(',').map(w => w.trim());
+      
+      // Reset all pills
+      document.querySelectorAll('.wave-pill').forEach(pill => {
+        pill.classList.remove('active');
+        pill.style.background = '#f0f0f0';
+        pill.style.color = '#333';
+        pill.style.borderColor = '#ddd';
+      });
+      
+      // Select each wave
+      waves.forEach(wave => {
+        const pill = document.querySelector(`.wave-pill[data-wave="${wave}"]`);
+        if (pill) {
+          pill.classList.add('active');
+          pill.style.background = '#4a6bff';
+          pill.style.color = 'white';
+          pill.style.borderColor = '#4a6bff';
+        }
+      });
+      
+      // Default to "All" if nothing valid selected
+      if (!document.querySelector('.wave-pill.active')) {
+        const allPill = document.querySelector('.wave-pill[data-wave="All"]');
+        allPill.classList.add('active');
+        allPill.style.background = '#4a6bff';
+        allPill.style.color = 'white';
+        allPill.style.borderColor = '#4a6bff';
+      }
+      
+      updateSelectedCount();
+      document.getElementById('waveHidden').value = waves.join(',');
+    }
+    
+    /* ================== QUESTION MANAGEMENT ================== */
+    function addQuestion(q = {}) {
+      const div = document.createElement('div');
+      div.className = 'question-section';
+      div.dataset.id = q.ID || '';
+      div.dataset.bankSerial = q.Quiz_Bank_serial || ''; // Store bank serial in dataset
+      
+      // TimeAdded display
+      const timeAddedDisplay = q.TimeAdded ? `
+        <div class="question-time">
+          Added: ${formatDate(q.TimeAdded, 'short')}
+        </div>
+      ` : '';
+      
+      div.innerHTML = `
+        ${timeAddedDisplay}
+        
+        <div style="margin-bottom: 15px;">
+          <div class="section-title">Question</div>
+          <textarea name="question" placeholder="Enter your question here..." rows="2" required>${q.Question || ''}</textarea>
+          <div class="image-hint">Optional: Add Google Drive link for question image</div>
+          <div class="image-link-container">
+            <input name="questionImage" placeholder="https://drive.google.com/... (optional)" 
+                   value="${q.Question_image || ''}" type="url">
+            <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
+          </div>
+          <img class="image-preview" src="" alt="Preview">
+          ${q.Quiz_Bank_serial ? `<div style="margin-top: 5px; font-size: 12px; color: #666;">Bank Serial: ${q.Quiz_Bank_serial}</div>` : ''}
         </div>
         
-        <ul class="nav-links" id="navLinks">
-         <li><a href="createExam.html">Create Exam</a></li>
-          <li><a href="OpenExam.html" class="active">Open Exam</a></li>
-          <li><a href="index.html" >Results Board</a></li>
-          <li><a href="newWave.html" >Add Wave</a></li>
-          <li><a href="https://yassertawfek1990.github.io/UPC_QUIZ/" >Take Exam</a></li>
-        </ul>
-      </div>
-    </nav>
-
-<div class="card">
-  
-  <h2>Edit Quiz</h2>
-  
-  <select id="existingQuizzes"></select>
-  
-  <form id="quizForm">
-    <div class="form-row">
-      <div>
-        <div class="section-title">Quiz Title</div>
-        <input name="title" placeholder="quiz title" required disabled>
-      </div>
-      <div>
-        <div class="section-title">Time Limit (minutes)</div>
-        <input name="timer" type="number" min="1" placeholder="e.g., 15" required disabled>
-      </div>
-    </div>
-    
-    <div class="form-row">
-      <div>
-        <div class="section-title">Status</div>
-        <select name="status" required>
-          <option value="">-- Select Status --</option>
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
-      <div>
-        <div class="section-title">Waves</div>
-        <!-- Wave pills will be inserted here by JavaScript -->
-        <div id="waveContainer"></div>
-        <input type="hidden" name="wave" id="waveHidden" value="All">
-      </div>
-    </div>
-    
-    <div style="display: none;">
-      <div class="section-title">Question Bank</div>
-      <div class="bank">
-        <input id="serial" placeholder="Enter question serial number">
-        <button type="button" onclick="loadFromBank()" style="background:#6c757d;color:white;">📚 Load from Bank</button>
-      </div>
-    </div>
-    
-    <div style="display: none;">
-      <div class="section-title">Questions</div>
-      <div id="questions"></div>
-      <button type="button" onclick="addQuestion()" style="background:#4caf50;color:#fff;width:100%;margin-top:10px;">
-        ➕ Add New Question
-      </button>
-    </div>
-    
-    <div style="display: flex; gap: 10px; margin-top: 25px;">
-      <button type="submit" style="background:#4a6bff;color:#fff;flex:1;padding:12px;">
-        💾 Save Quiz
-      </button>
-    </div>
-  </form>
-  
-  <p id="msg"></p>
-</div>
-
-<script>
-   // Mobile menu toggle
-      const hamburger = document.getElementById('hamburger');
-      const navLinks = document.getElementById('navLinks');
-
-      hamburger.addEventListener('click', () => {
-        hamburger.classList.toggle('active');
-        navLinks.classList.toggle('active');
-      });
-
-      // Close mobile menu when clicking outside
-      document.addEventListener('click', (e) => {
-        if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
-          hamburger.classList.remove('active');
-          navLinks.classList.remove('active');
+        <div class="option-row">
+          <div>
+            <label class="option-label">Option A</label>
+            <input name="A" placeholder="Option A" value="${q.OptionA || ''}" required>
+            <div class="image-link-container">
+              <input name="A_image" placeholder="Image link (optional)" 
+                     value="${q.OptionA_image || ''}" type="url">
+              <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
+            </div>
+          </div>
+          <div>
+            <label class="option-label">Option B</label>
+            <input name="B" placeholder="Option B" value="${q.OptionB || ''}" required>
+            <div class="image-link-container">
+              <input name="B_image" placeholder="Image link (optional)" 
+                     value="${q.OptionB_image || ''}" type="url">
+              <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
+            </div>
+          </div>
+          <div>
+            <label class="option-label">Option C (optional)</label>
+            <input name="C" placeholder="Option C" value="${q.OptionC || ''}">
+            <div class="image-link-container">
+              <input name="C_image" placeholder="Image link (optional)" 
+                     value="${q.OptionC_image || ''}" type="url">
+              <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
+            </div>
+          </div>
+          <div>
+            <label class="option-label">Option D (optional)</label>
+            <input name="D" placeholder="Option D" value="${q.OptionD || ''}">
+            <div class="image-link-container">
+              <input name="D_image" placeholder="Image link (optional)" 
+                     value="${q.OptionD_image || ''}" type="url">
+              <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
+            </div>
+          </div>
+        </div>
+        
+        <div style="display:flex;gap:15px;align-items:center;margin-top:15px;">
+          <div style="flex:1;">
+            <div class="section-title">Correct Answer</div>
+            <input name="correct" placeholder="Correct Answer (A/B/C/D)" 
+                   value="${q.CorrectAnswer || ''}" 
+                   pattern="[A-D]" 
+                   title="Must be A, B, C, or D"
+                   required>
+          </div>
+          <button type="button" onclick="this.parentElement.parentElement.remove()" 
+                  style="background:#ff6b6b;color:#fff;margin-top:20px;">
+            🗑 Delete
+          </button>
+        </div>
+      `;
+      
+      document.getElementById('questions').appendChild(div);
+      // Initialize preview buttons
+      div.querySelectorAll('.preview-btn').forEach(btn => {
+        const input = btn.previousElementSibling;
+        const preview = btn.parentElement.nextElementSibling;
+        if (input.value) {
+          updatePreview(input.value, preview);
         }
       });
-
-      // Close mobile menu when clicking a link
-      document.querySelectorAll('.nav-links a').forEach(link => {
-        link.addEventListener('click', () => {
-          hamburger.classList.remove('active');
-          navLinks.classList.remove('active');
+    }
+    
+    function loadFromBank() {
+      const serial = document.getElementById('serial').value.trim();
+      if (!serial) {
+        msg('Please enter a serial number', 'warning');
+        return;
+      }
+      
+      const q = bank.find(b => b.Serial == serial);
+      if (q) {
+        // Add the serial number to the question object
+        q.Quiz_Bank_serial = serial;
+        addQuestion(q);
+        msg(`Loaded: "${q.Question?.substring(0, 50) || 'Question'}${q.Question?.length > 50 ? '...' : ''}"`, 'success');
+      } else {
+        msg(`Serial "${serial}" not found in bank`, 'error');
+      }
+      
+      document.getElementById('serial').value = '';
+    }
+    
+    function previewImage(button) {
+      const input = button.previousElementSibling;
+      const preview = button.parentElement.nextElementSibling;
+      const url = input.value.trim();
+      
+      if (url) {
+        updatePreview(url, preview);
+      } else {
+        preview.style.display = 'none';
+        msg('Please enter a URL first', 'info');
+      }
+    }
+    
+    function convertToDirectImageUrl(url) {
+      if (!url || typeof url !== "string") return "";
+      url = url.replace(/_+/g, "").trim();
+      const match = url.match(/[-\w]{25,}/);
+      if (!match) return "";
+      const fileId = match[0];
+      return `https://drive.google.com/thumbnail?id=${fileId}&sz=w1200`;
+    }
+    
+    function updatePreview(url, previewElement) {
+      if (!url) return;
+      
+      let directUrl = convertToDirectImageUrl(url);
+      previewElement.src = directUrl;
+      previewElement.style.display = 'block';
+      previewElement.onerror = () => {
+        previewElement.style.display = 'none';
+        msg('Could not load image. Please check the URL.', 'error');
+      };
+    }
+    
+    /* ================== QUIZ LOADING ================== */
+    document.getElementById('existingQuizzes').onchange = async function() {
+      const title = this.value;
+      const selectedOption = this.options[this.selectedIndex];
+      
+      if (!title) {
+        resetForm();
+        return;
+      }
+      
+      try {
+        const [titlesData, quizData] = await Promise.all([
+          fetch(`${QUIZ_SHEET}Titles`).then(r => r.json()),
+          fetch(`${QUIZ_SHEET}${title}`).then(r => r.json())
+        ]);
+        
+        const quizDetails = titlesData.find(t => t.Title === title);
+        if (!quizDetails) {
+          msg('Quiz not found', 'error');
+          return;
+        }
+        
+        currentQuizTitle = title;
+        currentQuizCreatedAt = quizDetails.Created_at || '';
+        document.getElementById('questions').innerHTML = '';
+        
+        // Show quiz metadata
+        const metaInfo = document.getElementById('quizMetaInfo');
+        metaInfo.style.display = 'block';
+        document.getElementById('createdAtValue').textContent = 
+          currentQuizCreatedAt ? formatDate(currentQuizCreatedAt, 'full') : 'Not recorded';
+        
+        // Update Last Updated time
+        document.getElementById('updatedAtValue').textContent = formatDate(new Date(), 'full');
+        
+        // Set basic fields
+        document.querySelector('[name=title]').value = quizDetails.Title;
+        document.querySelector('[name=timer]').value = quizDetails.Timer || 15;
+        document.querySelector('[name=status]').value = quizDetails.Status || 'inactive';
+        
+        // Set waves
+        selectWavesFromString(quizDetails.Wave);
+        
+        // Load questions
+        if (quizData && quizData.length > 0) {
+          quizData.forEach(q => {
+            if (q.Question) {
+              addQuestion({
+                ID: q.ID || '',
+                Question: q.Question,
+                OptionA: q.OptionA,
+                OptionB: q.OptionB,
+                OptionC: q.OptionC,
+                OptionD: q.OptionD,
+                CorrectAnswer: q.CorrectAnswer,
+                Quiz_Bank_serial: q.Quiz_Bank_serial || '',
+                Question_image: q.Question_image || '',
+                OptionA_image: q.OptionA_image || '',
+                OptionB_image: q.OptionB_image || '',
+                OptionC_image: q.OptionC_image || '',
+                OptionD_image: q.OptionD_image || '',
+                TimeAdded: q.TimeAdded
+              });
+            }
+          });
+          msg(`Loaded "${title}" with ${quizData.length} questions`, 'success');
+        } else {
+          addQuestion();
+          msg(`Loaded "${title}" (no questions yet)`, 'info');
+        }
+      } catch (error) {
+        console.error('Error loading quiz:', error);
+        msg('Error loading quiz', 'error');
+      }
+    };
+    
+    /* ================== FORM SUBMISSION ================== */
+    document.getElementById('quizForm').onsubmit = async function(e) {
+      e.preventDefault();
+      
+      const title = document.querySelector('[name=title]').value.trim();
+      const timer = document.querySelector('[name=timer]').value;
+      const status = document.querySelector('[name=status]').value;
+      const wave = document.getElementById('waveHidden').value;
+      
+      if (!title || !timer || !status) {
+        msg('Please fill all required fields', 'warning');
+        return;
+      }
+      
+      const questionSections = document.querySelectorAll('.question-section');
+      if (questionSections.length === 0) {
+        msg('Please add at least one question', 'warning');
+        return;
+      }
+      
+      const questions = [];
+      let hasError = false;
+      
+      questionSections.forEach((section, index) => {
+        const question = section.querySelector('[name=question]').value.trim();
+        const optionA = section.querySelector('[name=A]').value.trim();
+        const optionB = section.querySelector('[name=B]').value.trim();
+        const optionC = section.querySelector('[name=C]').value.trim();
+        const optionD = section.querySelector('[name=D]').value.trim();
+        const correct = section.querySelector('[name=correct]').value.trim().toUpperCase();
+        
+        // Get image links
+        const questionImage = section.querySelector('[name=questionImage]').value.trim();
+        const optionA_image = section.querySelector('[name=A_image]').value.trim();
+        const optionB_image = section.querySelector('[name=B_image]').value.trim();
+        const optionC_image = section.querySelector('[name=C_image]').value.trim();
+        const optionD_image = section.querySelector('[name=D_image]').value.trim();
+        
+        // Get bank serial from dataset
+        const bankSerial = section.dataset.bankSerial || '';
+        
+        // Validate required fields
+        if (!question || !optionA || !optionB || !correct) {
+          msg(`Question ${index + 1} is incomplete`, 'warning');
+          hasError = true;
+          return;
+        }
+        
+        if (!['A', 'B', 'C', 'D'].includes(correct)) {
+          msg(`Question ${index + 1}: Answer must be A, B, C, or D`, 'warning');
+          hasError = true;
+          return;
+        }
+        
+        if ((correct === 'C' && !optionC) || (correct === 'D' && !optionD)) {
+          msg(`Question ${index + 1}: Option ${correct} must be filled`, 'warning');
+          hasError = true;
+          return;
+        }
+        
+        questions.push({
+          id: section.dataset.id || null,
+          question: question,
+          optionA: optionA,
+          optionB: optionB,
+          optionC: optionC || '',
+          optionD: optionD || '',
+          correct: correct,
+          questionImage: questionImage,
+          optionA_image: optionA_image,
+          optionB_image: optionB_image,
+          optionC_image: optionC_image,
+          optionD_image: optionD_image,
+          bankSerial: bankSerial  // Add bank serial to the payload
         });
       });
-/* ================== CONFIG ================== */
-const QUIZ_API = 'https://script.google.com/macros/s/AKfycbzwBWpfNXaqIN3ycn10IDaf4FUJ1SBp4IcYRr7NDdlpqpjWFQNkKwav6AZfr8KvOZej/exec';
-const QUIZ_SHEET = 'https://opensheet.elk.sh/1LK6_tt32Jv7FYaKVirNjXhJm40qXXowW-BxXWLOXxEc/';
-const BANK_URL = 'https://opensheet.elk.sh/1Kp_2eyq6hcLe_mmhNfOwSQgBYPFG6U9oZKDf6jfMFqI/mcq';
-const WAVES_URL = 'https://opensheet.elk.sh/1BfUO480KG_5RtpmPqi-NzIVi6rYlBqOcT15WTlcSNlc/All';
-
-/* ================== STATE ================== */
-let bank = [];
-let wavesList = [];
-let currentQuizTitle = '';
-
-/* ================== INITIALIZATION ================== */
-window.onload = async () => {
-  try {
-    await loadQuizzes();
-    await loadWaves();
-    bank = await (await fetch(BANK_URL)).json();
-    addQuestion();
-    msg('System ready. Select waves by clicking on them.');
-  } catch (error) {
-    console.error('Initialization error:', error);
-    msg('Error loading data. Please refresh.');
-  }
-};
-
-/* ================== LOAD QUIZZES ================== */
-async function loadQuizzes() {
-  try {
-    const titles = await (await fetch(`${QUIZ_SHEET}Titles`)).json();
-    const select = document.getElementById('existingQuizzes');
-    select.innerHTML = '<option value="">-- Choose a Quiz --</option>';
-    titles.forEach(t => {
-      select.innerHTML += `<option value="${t.Title}">${t.Title} (${t.Wave || 'All'})</option>`;
-    });
-  } catch (error) {
-    console.error('Error loading quizzes:', error);
-  }
-}
-
-/* ================== WAVE SELECTION (PILL BUTTONS) ================== */
-async function loadWaves() {
-  try {
-    wavesList = await (await fetch(WAVES_URL)).json();
-    setupWavePills();
-  } catch (error) {
-    console.error('Error loading waves:', error);
-    wavesList = [{Waves: 'All'}];
-    setupWavePills();
-  }
-}
-
-function setupWavePills() {
-  const container = document.getElementById('waveContainer');
-  container.innerHTML = `
-    <div id="wavePills" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
-    <div style="color:#666;font-size:14px;margin-bottom:8px;">
-      Click to select waves. <span id="selectedCount">(1 selected)</span>
-    </div>
-    <div id="waveSearch" style="margin-top:5px;">
-      <input type="text" placeholder="Search waves..." 
-             style="width:100%;padding:8px;border:1px solid #ddd;border-radius:4px;"
-             oninput="filterWaves(this.value)">
-    </div>
-  `;
-  
-  // Add "All" pill
-  const wavePillsDiv = document.getElementById('wavePills');
-  const allPill = document.createElement('button');
-  allPill.type = 'button';
-  allPill.className = 'wave-pill active';
-  allPill.dataset.wave = 'All';
-  allPill.textContent = 'All';
-  allPill.onclick = () => selectWavePill('All');
-  allPill.onmouseenter = () => {
-    if (!allPill.classList.contains('active')) allPill.style.borderColor = '#4a6bff';
-  };
-  allPill.onmouseleave = () => {
-    if (!allPill.classList.contains('active')) allPill.style.borderColor = '#ddd';
-  };
-  wavePillsDiv.appendChild(allPill);
-  
-  // Add wave pills from sheet
-  wavesList.forEach(waveObj => {
-    const waveName = waveObj.Waves;
-    if (waveName && waveName !== 'All') {
-      const pill = document.createElement('button');
-      pill.type = 'button';
-      pill.className = 'wave-pill';
-      pill.dataset.wave = waveName;
-      pill.textContent = waveName;
-      pill.onclick = () => selectWavePill(waveName);
-      pill.onmouseenter = () => {
-        if (!pill.classList.contains('active')) {
-          pill.style.borderColor = '#4a6bff';
-          pill.style.background = '#e8eeff';
-        }
-      };
-      pill.onmouseleave = () => {
-        if (!pill.classList.contains('active')) {
-          pill.style.borderColor = '#ddd';
-          pill.style.background = '#f0f0f0';
-        }
-      };
-      wavePillsDiv.appendChild(pill);
-    }
-  });
-  
-  updateSelectedCount();
-}
-
-function selectWavePill(waveName) {
-  const pills = document.querySelectorAll('.wave-pill');
-  const hiddenInput = document.getElementById('waveHidden');
-  
-  if (waveName === 'All') {
-    // Select only "All"
-    pills.forEach(pill => {
-      const isAll = pill.dataset.wave === 'All';
-      pill.classList.toggle('active', isAll);
-      pill.style.background = isAll ? '#4a6bff' : '#f0f0f0';
-      pill.style.color = isAll ? 'white' : '#333';
-      pill.style.borderColor = isAll ? '#4a6bff' : '#ddd';
-    });
-    hiddenInput.value = 'All';
-  } else {
-    // Toggle specific wave
-    const allPill = document.querySelector('.wave-pill[data-wave="All"]');
-    allPill.classList.remove('active');
-    allPill.style.background = '#f0f0f0';
-    allPill.style.color = '#333';
-    allPill.style.borderColor = '#ddd';
-    
-    const clickedPill = document.querySelector(`.wave-pill[data-wave="${waveName}"]`);
-    clickedPill.classList.toggle('active');
-    clickedPill.style.background = clickedPill.classList.contains('active') ? '#4a6bff' : '#f0f0f0';
-    clickedPill.style.color = clickedPill.classList.contains('active') ? 'white' : '#333';
-    clickedPill.style.borderColor = clickedPill.classList.contains('active') ? '#4a6bff' : '#ddd';
-    
-    // Update hidden value
-    const selectedPills = document.querySelectorAll('.wave-pill.active');
-    if (selectedPills.length === 0) {
-      hiddenInput.value = 'All';
-      allPill.classList.add('active');
-      allPill.style.background = '#4a6bff';
-      allPill.style.color = 'white';
-      allPill.style.borderColor = '#4a6bff';
-    } else {
-      hiddenInput.value = Array.from(selectedPills).map(p => p.dataset.wave).join(',');
-    }
-  }
-  
-  updateSelectedCount();
-}
-
-function filterWaves(searchTerm) {
-  const pills = document.querySelectorAll('.wave-pill:not([data-wave="All"])');
-  const lowerSearch = searchTerm.toLowerCase();
-  pills.forEach(pill => {
-    pill.style.display = pill.dataset.wave.toLowerCase().includes(lowerSearch) || !searchTerm ? 'inline-block' : 'none';
-  });
-}
-
-function updateSelectedCount() {
-  const count = document.querySelectorAll('.wave-pill.active').length;
-  document.getElementById('selectedCount').textContent = `(${count} selected)`;
-}
-
-function selectWavesFromString(waveString) {
-  const waves = (waveString || 'All').split(',').map(w => w.trim());
-  
-  // Reset all pills
-  document.querySelectorAll('.wave-pill').forEach(pill => {
-    pill.classList.remove('active');
-    pill.style.background = '#f0f0f0';
-    pill.style.color = '#333';
-    pill.style.borderColor = '#ddd';
-  });
-  
-  // Select each wave
-  waves.forEach(wave => {
-    const pill = document.querySelector(`.wave-pill[data-wave="${wave}"]`);
-    if (pill) {
-      pill.classList.add('active');
-      pill.style.background = '#4a6bff';
-      pill.style.color = 'white';
-      pill.style.borderColor = '#4a6bff';
-    }
-  });
-  
-  // Default to "All" if nothing valid selected
-  if (!document.querySelector('.wave-pill.active')) {
-    const allPill = document.querySelector('.wave-pill[data-wave="All"]');
-    allPill.classList.add('active');
-    allPill.style.background = '#4a6bff';
-    allPill.style.color = 'white';
-    allPill.style.borderColor = '#4a6bff';
-  }
-  
-  updateSelectedCount();
-  document.getElementById('waveHidden').value = waves.join(',');
-}
-
-/* ================== QUESTION MANAGEMENT ================== */
-function addQuestion(q = {}) {
-  const div = document.createElement('div');
-  div.className = 'question-section';
-  div.dataset.id = q.ID || '';
-  
-  div.innerHTML = `
-    <input name="question" placeholder="Question" value="${q.Question || ''}" required>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0;">
-      <input name="A" placeholder="Option A" value="${q.OptionA || ''}" required>
-      <input name="B" placeholder="Option B" value="${q.OptionB || ''}" required>
-      <input name="C" placeholder="Option C" value="${q.OptionC || ''}">
-      <input name="D" placeholder="Option D" value="${q.OptionD || ''}">
-    </div>
-    <div style="display:flex;gap:10px;align-items:center;">
-      <input name="correct" placeholder="Correct Answer (A/B/C/D)" 
-             value="${q.CorrectAnswer || ''}" 
-             pattern="[A-D]" 
-             title="Must be A, B, C, or D"
-             required
-             style="flex:1;">
-      <button type="button" onclick="this.parentElement.parentElement.remove()" 
-              style="background:#ff6b6b;color:#fff;">
-        🗑 Delete
-      </button>
-    </div>
-    ${q.TimeAdded ? `<small style="color:#666;display:block;margin-top:5px;">Added: ${formatDate(q.TimeAdded)}</small>` : ''}
-  `;
-  
-  document.getElementById('questions').appendChild(div);
-}
-
-function loadFromBank() {
-  const serial = document.getElementById('serial').value.trim();
-  if (!serial) return msg('Please enter a serial number');
-  
-  const q = bank.find(b => b.Serial == serial);
-  if (q) {
-    addQuestion(q);
-    msg(`Loaded: "${q.Question.substring(0, 50)}${q.Question.length > 50 ? '...' : ''}"`);
-  } else {
-    msg(`Serial "${serial}" not found in bank`);
-  }
-  
-  document.getElementById('serial').value = '';
-}
-
-/* ================== QUIZ LOADING ================== */
-document.getElementById('existingQuizzes').onchange = async function() {
-  const title = this.value;
-  
-  if (!title) {
-    resetForm();
-    return;
-  }
-  
-  try {
-    const [titlesData, quizData] = await Promise.all([
-      fetch(`${QUIZ_SHEET}Titles`).then(r => r.json()),
-      fetch(`${QUIZ_SHEET}${title}`).then(r => r.json())
-    ]);
-    
-    const quizDetails = titlesData.find(t => t.Title === title);
-    if (!quizDetails) {
-      msg('Quiz not found');
-      return;
-    }
-    
-    currentQuizTitle = title;
-    document.getElementById('questions').innerHTML = '';
-    
-    // Set basic fields
-    document.querySelector('[name=title]').value = quizDetails.Title;
-    document.querySelector('[name=timer]').value = quizDetails.Timer || 15;
-    document.querySelector('[name=status]').value = quizDetails.Status || 'inactive';
-    
-    // Set waves
-    selectWavesFromString(quizDetails.Wave);
-    
-    // Load questions
-    if (quizData && quizData.length > 0) {
-      quizData.forEach(q => {
-        if (q.Question) {
-          addQuestion({
-            ID: q.ID || '',
-            Question: q.Question,
-            OptionA: q.OptionA,
-            OptionB: q.OptionB,
-            OptionC: q.OptionC,
-            OptionD: q.OptionD,
-            CorrectAnswer: q.CorrectAnswer,
-            TimeAdded: q.TimeAdded
-          });
-        }
-      });
-      msg(`Loaded "${title}" with ${quizData.length} questions`);
-    } else {
-      addQuestion();
-      msg(`Loaded "${title}" (no questions yet)`);
-    }
-  } catch (error) {
-    console.error('Error loading quiz:', error);
-    msg('Error loading quiz');
-  }
-};
-
-/* ================== FORM SUBMISSION ================== */
-document.getElementById('quizForm').onsubmit = async function(e) {
-  e.preventDefault();
-  
-  const title = document.querySelector('[name=title]').value.trim();
-  const timer = document.querySelector('[name=timer]').value;
-  const status = document.querySelector('[name=status]').value;
-  const wave = document.getElementById('waveHidden').value;
-  
-  if (!title || !timer || !status) {
-    msg('Please fill all required fields');
-    return;
-  }
-  
-  const questionSections = document.querySelectorAll('.question-section');
-  if (questionSections.length === 0) {
-    msg('Please add at least one question');
-    return;
-  }
-  
-  const questions = [];
-  let hasError = false;
-  
-  questionSections.forEach((section, index) => {
-    const question = section.querySelector('[name=question]').value.trim();
-    const optionA = section.querySelector('[name=A]').value.trim();
-    const optionB = section.querySelector('[name=B]').value.trim();
-    const optionC = section.querySelector('[name=C]').value.trim();
-    const optionD = section.querySelector('[name=D]').value.trim();
-    const correct = section.querySelector('[name=correct]').value.trim().toUpperCase();
-    
-    if (!question || !optionA || !optionB || !correct) {
-      msg(`Question ${index + 1} is incomplete`);
-      hasError = true;
-      return;
-    }
-    
-    if (!['A', 'B', 'C', 'D'].includes(correct)) {
-      msg(`Question ${index + 1}: Answer must be A, B, C, or D`);
-      hasError = true;
-      return;
-    }
-    
-    if ((correct === 'C' && !optionC) || (correct === 'D' && !optionD)) {
-      msg(`Question ${index + 1}: Option ${correct} must be filled`);
-      hasError = true;
-      return;
-    }
-    
-    questions.push({
-      id: section.dataset.id || null,
-      question: question,
-      optionA: optionA,
-      optionB: optionB,
-      optionC: optionC || '',
-      optionD: optionD || '',
-      correct: correct
-    });
-  });
-  
-  if (hasError) return;
-  
-  const payload = {
-    type: 'updateQuestion',
-    title: title,
-    timer: timer,
-    status: status,
-    wave: wave,
-    questions: questions
-  };
-  
-  console.log('Saving:', payload);
-  
-  try {
-    const response = await fetch(QUIZ_API, {
-      method: 'POST',
-      body: JSON.stringify(payload)
-    });
-    
-    const result = await response.text();
-    console.log('Server:', result);
-    
-    if (result.includes('✅') || result.includes('🔄') || result.includes('Added') || result.includes('success')) {
-      msg(`✅ Quiz "${title}" saved successfully!`);
-      await loadQuizzes();
       
-      if (currentQuizTitle !== title) {
-        setTimeout(() => location.reload(), 1500);
+      if (hasError) return;
+      
+      const payload = {
+        type: 'updateQuestion',
+        title: title,
+        timer: timer,
+        status: status,
+        wave: wave,
+        created_at: currentQuizCreatedAt, // Pass existing Created_at if it exists
+        questions: questions
+      };
+      
+      console.log('Saving:', payload);
+      msg('Saving quiz...', 'info');
+      
+      try {
+        const response = await fetch(QUIZ_API, {
+          method: 'POST',
+          body: JSON.stringify(payload)
+        });
+        
+        const result = await response.text();
+        console.log('Server response:', result);
+        
+        if (result.includes('✅') || result.includes('🔄') || result.includes('Added') || result.includes('success')) {
+          msg(`✅ Quiz "${title}" saved successfully!`, 'success');
+          await loadQuizzes();
+          
+          // Update Last Updated time
+          document.getElementById('updatedAtValue').textContent = formatDate(new Date(), 'full');
+          
+          if (currentQuizTitle !== title) {
+            setTimeout(() => location.reload(), 1500);
+          }
+        } else {
+          msg(`❌ ${result}`, 'error');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        msg('❌ Network error saving quiz', 'error');
       }
-    } else {
-      msg(`❌ ${result}`);
+    };
+    
+    /* ================== UTILITY FUNCTIONS ================== */
+    function resetForm() {
+      currentQuizTitle = '';
+      currentQuizCreatedAt = '';
+      document.getElementById('questions').innerHTML = '';
+      document.getElementById('quizForm').reset();
+      document.getElementById('quizMetaInfo').style.display = 'none';
+      selectWavesFromString('All');
+      addQuestion();
+      msg('Ready to create new quiz', 'info');
     }
-  } catch (error) {
-    console.error('Error:', error);
-    msg('❌ Network error saving quiz');
-  }
-};
-
-/* ================== UTILITY FUNCTIONS ================== */
-function resetForm() {
-  currentQuizTitle = '';
-  document.getElementById('questions').innerHTML = '';
-  document.getElementById('quizForm').reset();
-  selectWavesFromString('All');
-  addQuestion();
-  msg('Ready to create new quiz');
-}
-
-function formatDate(dateString) {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  return date.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-}
-
-function msg(text) {
-  const msgEl = document.getElementById('msg');
-  msgEl.textContent = text;
-  msgEl.style.color = text.includes('❌') ? '#d32f2f' : 
-                     text.includes('✅') ? '#2e7d32' : '#1976d2';
-  setTimeout(() => msgEl.textContent = '', 5000);
-}
-</script>
+    
+    function formatDate(dateString, format = 'short') {
+      if (!dateString) return '';
+      
+      try {
+        const date = new Date(dateString);
+        if (isNaN(date.getTime())) {
+          // If dateString is invalid, try to parse it
+          const parsedDate = new Date(dateString.replace(/(\d{4})-(\d{2})-(\d{2})/, '$1/$2/$3'));
+          if (isNaN(parsedDate.getTime())) {
+            return dateString; // Return original if still invalid
+          }
+          return formatDateObject(parsedDate, format);
+        }
+        return formatDateObject(date, format);
+      } catch (e) {
+        return dateString; // Return original if parsing fails
+      }
+    }
+    
+    function formatDateObject(date, format) {
+      const now = new Date();
+      const isToday = date.toDateString() === now.toDateString();
+      
+      switch(format) {
+        case 'short':
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        case 'full':
+          return date.toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          });
+        case 'relative':
+          if (isToday) {
+            return `Today at ${date.toLocaleTimeString('en-US', {hour: '2-digit', minute: '2-digit'})}`;
+          }
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        default:
+          return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+      }
+    }
+    
+    function msg(text, type = 'info') {
+      const msgEl = document.getElementById('msg');
+      msgEl.textContent = text;
+      msgEl.style.display = 'block';
+      
+      switch(type) {
+        case 'success':
+          msgEl.style.backgroundColor = '#d4edda';
+          msgEl.style.color = '#155724';
+          msgEl.style.border = '1px solid #c3e6cb';
+          break;
+        case 'error':
+          msgEl.style.backgroundColor = '#f8d7da';
+          msgEl.style.color = '#721c24';
+          msgEl.style.border = '1px solid #f5c6cb';
+          break;
+        case 'warning':
+          msgEl.style.backgroundColor = '#fff3cd';
+          msgEl.style.color = '#856404';
+          msgEl.style.border = '1px solid #ffeaa7';
+          break;
+        default:
+          msgEl.style.backgroundColor = '#d1ecf1';
+          msgEl.style.color = '#0c5460';
+          msgEl.style.border = '1px solid #bee5eb';
+      }
+      
+      setTimeout(() => {
+        msgEl.style.display = 'none';
+      }, 5000);
+    }
+  </script>
 </body>
-
 </html>
-
