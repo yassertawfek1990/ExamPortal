@@ -262,6 +262,38 @@
       border-radius: 12px;
       border: 1px solid #e1e7ff;
     }
+    
+    .question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .question-meta {
+      display: flex;
+      gap: 15px;
+      font-size: 12px;
+      color: #666;
+    }
+    
+    .bank-serial-badge {
+      background: #e8eeff;
+      color: #4a6bff;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+      border: 1px solid #d1dbff;
+    }
+    
+    .question-id-badge {
+      background: #f0f0f0;
+      color: #666;
+      padding: 3px 10px;
+      border-radius: 12px;
+      font-weight: 500;
+      border: 1px solid #ddd;
+    }
   </style>
 </head>
 <body>
@@ -279,13 +311,13 @@
         <span></span>
       </div>
       
-      <ul class="nav-links" id="navLinks">
-        <li><a href="createExam.html" class="active">Create Exam</a></li>
-        <li><a href="OpenExam.html">Open Exam</a></li>
-        <li><a href="index.html">Results Board</a></li>
-        <li><a href="newWave.html">Add Wave</a></li>
-        <li><a href="https://yassertawfek1990.github.io/UPC_QUIZ/">Take Exam</a></li>
-      </ul>
+            <ul class="nav-links" id="navLinks">
+          <li><a href="createExam.html" class="active">Create Exam</a></li>
+          <li><a href="OpenExam.html">Open Exam</a></li>
+          <li><a href="index.html" >Results Board</a></li>
+          <li><a href="newWave.html" >Add Wave</a></li>
+          <li><a href="https://yassertawfek1990.github.io/UPC_QUIZ/" >Take Exam</a></li>
+        </ul>
     </div>
   </nav>
 
@@ -383,8 +415,8 @@
       });
     });
     
-  /* ================== CONFIG ================== */
-    const QUIZ_API = 'https://script.google.com/macros/s/AKfycbyxtQFMyq_M2fnEgUdk8x95QIXrRSBUIZ-DrIuah1FaiXVWAcV__wIkhQ9jFDy7Ip55/exec';
+    /* ================== CONFIG ================== */
+    const QUIZ_API = 'https://script.google.com/macros/s/AKfycbwBuLeVvO0qSsij9k72fPt132QlEjLU-wmYvnay1QNbOKkPeJSKQ6MwxoH44qbhXGmB/exec';
     const QUIZ_SHEET = 'https://opensheet.elk.sh/1zq1ei3A6LcuUPp77WLl8hiP2MCdTHfbV2ScMF2cvzu0/';
     const BANK_URL = 'https://opensheet.elk.sh/1Kp_2eyq6hcLe_mmhNfOwSQgBYPFG6U9oZKDf6jfMFqI/mcq';
     const WAVES_URL = 'https://opensheet.elk.sh/1BfUO480KG_5RtpmPqi-NzIVi6rYlBqOcT15WTlcSNlc/All';
@@ -417,7 +449,6 @@
         select.innerHTML = '<option value="">-- Create New Quiz --</option>';
         titles.forEach(t => {
           const createdAt = t.Created_at ? formatDate(t.Created_at, 'short') : 'Unknown date';
-          console.log(createdAt)
           const status = t.Status || 'inactive';
           const wave = t.Wave || 'All';
           const timer = t.Timer || '15';
@@ -429,19 +460,7 @@
         //     data-timer="${timer}">
         //     ${t.Title} (${wave}) - ${status} - Created: ${createdAt}
         //   </option>`;
-//         select.innerHTML += `
-//   <option value="${t.Title}"
-//     data-created="${t.Created_at || ''}"
-//     data-status="${status}"
-//     data-wave="${wave}"
-//     data-timer="${timer}">
-//     📘 ${t.Title}
-//     │ 🌊 ${wave}
-//     │ 🔘 ${status}
-//     │ 🕒 ${createdAt}
-//   </option>
-// `;
-select.innerHTML += `
+        select.innerHTML += `
   <option value="${t.Title}"
     data-created="${t.Created_at || ''}"
     data-status="${status}"
@@ -453,7 +472,6 @@ select.innerHTML += `
     │ 🕒 ${createdAt}
   </option>
 `;
-
         });
       } catch (error) {
         console.error('Error loading quizzes:', error);
@@ -630,15 +648,19 @@ select.innerHTML += `
       div.dataset.id = q.ID || '';
       div.dataset.bankSerial = q.Quiz_Bank_serial || ''; // Store bank serial in dataset
       
-      // TimeAdded display
-      const timeAddedDisplay = q.TimeAdded ? `
-        <div class="question-time">
-          Added: ${formatDate(q.TimeAdded, 'short')}
+      // Question header with metadata
+      const questionHeader = `
+        <div class="question-header">
+          <div class="question-meta">
+            ${q.ID ? `<span class="question-id-badge">ID: ${q.ID}</span>` : ''}
+            ${q.Quiz_Bank_serial ? `<span class="bank-serial-badge">Bank Serial: ${q.Quiz_Bank_serial}</span>` : ''}
+          </div>
+          ${q.TimeAdded ? `<div class="question-time">Added: ${formatDate(q.TimeAdded, 'short')}</div>` : ''}
         </div>
-      ` : '';
+      `;
       
       div.innerHTML = `
-        ${timeAddedDisplay}
+        ${questionHeader}
         
         <div style="margin-bottom: 15px;">
           <div class="section-title">Question</div>
@@ -650,7 +672,6 @@ select.innerHTML += `
             <button type="button" class="preview-btn" onclick="previewImage(this)">Preview</button>
           </div>
           <img class="image-preview" src="" alt="Preview">
-          ${q.Quiz_Bank_serial ? `<div style="margin-top: 5px; font-size: 12px; color: #666;">Bank Serial: ${q.Quiz_Bank_serial}</div>` : ''}
         </div>
         
         <div class="option-row">
@@ -818,8 +839,12 @@ select.innerHTML += `
         
         // Load questions
         if (quizData && quizData.length > 0) {
+          let bankSerialCount = 0;
           quizData.forEach(q => {
             if (q.Question) {
+              if (q.Quiz_Bank_serial) {
+                bankSerialCount++;
+              }
               addQuestion({
                 ID: q.ID || '',
                 Question: q.Question,
@@ -838,7 +863,7 @@ select.innerHTML += `
               });
             }
           });
-          msg(`Loaded "${title}" with ${quizData.length} questions`, 'success');
+          msg(`Loaded "${title}" with ${quizData.length} questions (${bankSerialCount} from bank)`, 'success');
         } else {
           addQuestion();
           msg(`Loaded "${title}" (no questions yet)`, 'info');
@@ -1075,4 +1100,3 @@ select.innerHTML += `
   </script>
 </body>
 </html>
-
