@@ -414,7 +414,7 @@
       try {
         const titles = await (await fetch(`${QUIZ_SHEET}Titles`)).json();
         const select = document.getElementById('existingQuizzes');
-        select.innerHTML = '<option value="">-- Create New Quiz --</option>';
+        select.innerHTML = '<option value="">-- Select a quiz to open or close--</option>';
         titles.forEach(t => {
           const createdAt = t.Created_at ? formatDate(t.Created_at, 'short') : 'Unknown date';
           console.log(createdAt)
