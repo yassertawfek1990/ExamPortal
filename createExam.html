@@ -953,13 +953,27 @@
       
       if (hasError) return;
       
+      //const payload = {
+        //type: 'updateQuestion',
+        //title: title,
+        //timer: timer,
+        //status: status,
+        //wave: wave,
+        //created_at: currentQuizCreatedAt, // Pass existing Created_at if it exists
+        //questions: questions
+      //};
+
+      const isTitleChanged = currentQuizTitle && currentQuizTitle !== title;
+
       const payload = {
-        type: 'updateQuestion',
+        
+        type: isTitleChanged ? 'addQuestions' : 'updateQuestion',
         title: title,
+        originalTitle: currentQuizTitle || '',   // backend can use this if needed
         timer: timer,
         status: status,
         wave: wave,
-        created_at: currentQuizCreatedAt, // Pass existing Created_at if it exists
+        created_at: isTitleChanged ? '' : currentQuizCreatedAt, // new quiz = new created_at
         questions: questions
       };
       
@@ -982,9 +996,16 @@
           // Update Last Updated time
           document.getElementById('updatedAtValue').textContent = formatDate(new Date(), 'full');
           
-          if (currentQuizTitle !== title) {
-            setTimeout(() => location.reload(), 1500);
-          }
+          // if (currentQuizTitle !== title) {
+          //   setTimeout(() => location.reload(), 1500);
+          // }
+
+        // AFTER
+        currentQuizTitle = title;           // update tracker so subsequent saves work correctly
+        currentQuizCreatedAt = '';          // will be set by server on next load
+        if (isTitleChanged) {
+          setTimeout(() => location.reload(), 1500);
+        }
         } else {
           msg(`❌ ${result}`, 'error');
         }
