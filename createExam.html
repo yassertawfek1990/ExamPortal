@@ -451,7 +451,8 @@
           const createdAt = t.Created_at ? formatDate(t.Created_at, 'short') : 'Unknown date';
           const status = t.Status || 'inactive';
           const wave = t.Wave || 'All';
-          const timer = t.Timer || '15';
+          //const timer = t.Timer || '15';
+          const timer = t.Timer;
           
         //   select.innerHTML += `<option value="${t.Title}" 
         //     data-created="${t.Created_at || ''}"
