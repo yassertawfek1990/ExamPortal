@@ -832,7 +832,8 @@
         
         // Set basic fields
         document.querySelector('[name=title]').value = quizDetails.Title;
-        document.querySelector('[name=timer]').value = quizDetails.Timer || 15;
+        // document.querySelector('[name=timer]').value = quizDetails.Timer || 15;
+        document.querySelector('[name=timer]').value = quizDetails.Timer;
         document.querySelector('[name=status]').value = quizDetails.Status || 'inactive';
         
         // Set waves
