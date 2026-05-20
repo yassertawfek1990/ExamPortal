@@ -20,6 +20,8 @@
       --success:       #00ff88;
       --error:         #ff3366;
       --warning:       #ffcc00;
+      --dup-bg:        rgba(255,51,102,0.07);
+      --dup-border:    rgba(255,51,102,0.35);
     }
 
     body {
@@ -204,6 +206,19 @@
 
     button.secondary:hover { background: var(--bg-card); box-shadow: none; }
 
+    /* ── Duplicate toggle button states ── */
+    button.dup-active {
+      background: var(--bg-secondary);
+      color: var(--error);
+      border: 1px solid var(--error);
+      box-shadow: 0 0 10px rgba(255,51,102,0.2);
+    }
+
+    button.dup-active:hover {
+      background: rgba(255,51,102,0.1);
+      box-shadow: 0 4px 16px rgba(255,51,102,0.3);
+    }
+
     .stats {
       display: flex; gap: 20px;
       padding: 16px 0;
@@ -211,10 +226,12 @@
       margin-top: 16px;
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem;
+      flex-wrap: wrap;
     }
 
     .stat-item { color: var(--text-secondary); }
     .stat-value { color: var(--accent-cyan); font-weight: 600; margin-left: 6px; }
+    .stat-value.dup-stat { color: var(--error); }
 
     /* ── Question stats ── */
     .question-stats {
@@ -290,6 +307,39 @@
 
     tbody tr { transition: all 0.2s ease; }
     tbody tr:hover { background: rgba(0,255,245,0.05); }
+
+    /* ── Duplicate row styling ── */
+    tbody tr.is-duplicate {
+      background: var(--dup-bg);
+      border-left: 3px solid var(--dup-border);
+      opacity: 0.72;
+    }
+
+    tbody tr.is-duplicate:hover {
+      background: rgba(255,51,102,0.1);
+      opacity: 0.9;
+    }
+
+    tbody tr.is-duplicate td {
+      color: var(--text-secondary);
+    }
+
+    .dup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      background: rgba(255,51,102,0.15);
+      border: 1px solid var(--error);
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--error);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
 
     .score-cell { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
     .score-good   { color: var(--success); }
@@ -469,12 +519,14 @@
         <button onclick="applyFilters()">Apply Filters</button>
         <button class="secondary" onclick="clearFilters()">Clear All</button>
         <button class="secondary" onclick="downloadCSV()">⬇ Download CSV</button>
+        <button class="secondary" id="dupToggleBtn" onclick="toggleDuplicates()">⧉ Hide Duplicates</button>
       </div>
 
       <div class="stats">
         <div class="stat-item">Total Records: <span class="stat-value" id="totalRecords">0</span></div>
         <div class="stat-item">Filtered: <span class="stat-value" id="filteredRecords">0</span></div>
         <div class="stat-item">Avg Score: <span class="stat-value" id="avgScore">0%</span></div>
+        <div class="stat-item">Duplicates: <span class="stat-value dup-stat" id="dupRecords">0</span></div>
       </div>
 
       <div id="questionStats" class="question-stats" style="display:none;">
@@ -517,18 +569,47 @@
     const QUESTIONS_BASE = 'https://opensheet.elk.sh/1zq1ei3A6LcuUPp77WLl8hiP2MCdTHfbV2ScMF2cvzu0/';
 
     // ── State ─────────────────────────────────────────────────────────────────
-    let allData      = [];
-    let filteredData = [];
+    let allData          = [];
+    let filteredData     = [];
+    let hidingDuplicates = false;
+
+    /*
+     * Duplicate detection key:
+     *   name + email + quiz title + wave + score + mobile
+     * All six fields must match for a row to be considered a duplicate.
+     * The FIRST occurrence (earliest timestamp) is kept as original;
+     * all subsequent matches are flagged as duplicates.
+     */
+    function buildDupKey(item) {
+      return [
+        (item.Name          || '').trim().toLowerCase(),
+        (item.Email         || '').trim().toLowerCase(),
+        (item['Quiz Title'] || '').trim().toLowerCase(),
+        (item.Wave          || '').trim().toLowerCase(),
+        String(parseInt(item.Score) || 0),
+        (item.Mobile        || '').trim().toLowerCase()
+      ].join('||');
+    }
+
+    function markDuplicates(data) {
+      const seen = new Set();
+      // Data assumed to be in chronological order (Google Sheets append order).
+      // First occurrence = original; rest = duplicate.
+      return data.map(item => {
+        const key = buildDupKey(item);
+        if (seen.has(key)) {
+          return { ...item, _isDuplicate: true };
+        }
+        seen.add(key);
+        return { ...item, _isDuplicate: false };
+      });
+    }
 
     /*
      * questionCache[quizTitle] = {
      *   byId:    { [id]:    { id, sheetIndex, question, correctAnswer, options } }
      *   byIndex: { [index]: { id, sheetIndex, question, correctAnswer, options } }
      * }
-     *
-     * We store BOTH lookup maps because:
-     *   • Wrong-answer chips use question ID  (stored in "Wrong Answers" column)
-     *   • User-answer lookup needs sheetIndex (the Answers array is positional)
      */
     const questionCache = {};
 
@@ -568,7 +649,6 @@
       tooltipLayer.appendChild(tip);
       activeTooltip = tip;
 
-      // Position after paint so we know tip dimensions
       requestAnimationFrame(() => {
         const ar = anchorEl.getBoundingClientRect();
         const tr = tip.getBoundingClientRect();
@@ -576,7 +656,6 @@
         let top  = ar.top - tr.height - 12;
         let left = ar.left + ar.width / 2 - tr.width / 2;
 
-        // Keep inside viewport
         if (top < 8) top = ar.bottom + 8;
         left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
 
@@ -590,7 +669,6 @@
       if (activeTooltip) { activeTooltip.remove(); activeTooltip = null; }
     }
 
-    // Event delegation — attach once on document
     document.addEventListener('mouseover', e => {
       const chip = e.target.closest('[data-tip]');
       if (chip) showTooltip(chip, chip.dataset.tip);
@@ -612,11 +690,6 @@
         const byIndex = {};
 
         questions.forEach((q, sheetIndex) => {
-          /*
-           * ID from the spreadsheet may be numeric or string.
-           * We coerce to string for consistent key usage.
-           * If no ID column exists we fall back to (sheetIndex + 1).
-           */
           const id = (q.ID !== undefined && q.ID !== '') ? String(q.ID) : String(sheetIndex + 1);
 
           const entry = {
@@ -632,8 +705,8 @@
             }
           };
 
-          byId[id]              = entry;
-          byIndex[sheetIndex]   = entry;
+          byId[id]            = entry;
+          byIndex[sheetIndex] = entry;
         });
 
         questionCache[quizTitle] = { byId, byIndex };
@@ -646,11 +719,6 @@
     }
 
     // ── Parse helpers ─────────────────────────────────────────────────────────
-
-    /**
-     * Parse the "Answers" column → positional array of answer letters.
-     * The array is in original spreadsheet order (index 0 = question at row 0 in sheet).
-     */
     function parseAnswers(raw) {
       if (!raw || !raw.trim()) return [];
       try {
@@ -658,15 +726,10 @@
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) return parsed.map(v => String(v || '').trim().toUpperCase());
         }
-      } catch (_) { /* fall through */ }
-
-      // Comma-separated fallback
+      } catch (_) {}
       return raw.split(',').map(v => v.trim().toUpperCase()).filter(Boolean);
     }
 
-    /**
-     * Parse the "Wrong Answers" column → array of question ID strings.
-     */
     function parseWrongAnswerIds(raw) {
       if (!raw || !raw.trim()) return [];
       try {
@@ -674,13 +737,11 @@
           const parsed = JSON.parse(raw);
           if (Array.isArray(parsed)) return parsed.map(v => String(v).trim()).filter(Boolean);
         }
-      } catch (_) { /* fall through */ }
-
+      } catch (_) {}
       return raw.split(',').map(v => v.trim()).filter(Boolean);
     }
 
     // ── Formatting ────────────────────────────────────────────────────────────
-
     function formatDuration(seconds) {
       const m = Math.floor(seconds / 60);
       const s = seconds % 60;
@@ -703,7 +764,6 @@
     }
 
     // ── Tooltip HTML builders ─────────────────────────────────────────────────
-
     function buildWrongChipTooltip(qEntry, userAnswerLetter) {
       const correct     = qEntry.correctAnswer;
       const correctText = qEntry.options[correct] || correct || 'N/A';
@@ -778,7 +838,6 @@
     }
 
     // ── Table rendering ───────────────────────────────────────────────────────
-
     async function renderTable(data) {
       const tbody = document.getElementById('tableBody');
 
@@ -794,6 +853,7 @@
         const total    = parseInt(item['Total Score']) || 0;
         const duration = parseInt(item.Duration)       || 0;
         const cls      = scoreClass(score, total);
+        const isDup    = item._isDuplicate === true;
 
         let wrongHTML = '<span style="color:var(--text-secondary)">—</span>';
 
@@ -803,17 +863,13 @@
           const wrongIds = parseWrongAnswerIds(rawWrong);
 
           if (wrongIds.length > 0 && item['Quiz Title']) {
-            const { byId, byIndex } = await fetchQuestionData(item['Quiz Title']);
-            const userAnswers       = parseAnswers(item.Answers || '');
+            const { byId } = await fetchQuestionData(item['Quiz Title']);
+            const userAnswers = parseAnswers(item.Answers || '');
 
             const chips = wrongIds.map(id => {
               const qEntry = byId[id];
-              if (!qEntry) {
-                // Question not found — show chip without tooltip
-                return `<span class="wrong-chip">${id}</span>`;
-              }
+              if (!qEntry) return `<span class="wrong-chip">${id}</span>`;
 
-              // User's answer lives at qEntry.sheetIndex in the positional answers array
               const userLetter = (userAnswers[qEntry.sheetIndex] || '').toUpperCase() || null;
               const tip = buildWrongChipTooltip(qEntry, userLetter).replace(/'/g, '&#39;');
 
@@ -830,10 +886,14 @@
           wrongHTML = '<span style="color:var(--success)">Perfect!</span>';
         }
 
+        const dupBadge = isDup
+          ? `<span class="dup-badge" title="Exact duplicate submission — same name, email, quiz, wave, score &amp; mobile">⧉ DUP</span>`
+          : '';
+
         return `
-          <tr>
+          <tr class="${isDup ? 'is-duplicate' : ''}">
             <td>${formatTimestamp(item.Timestamp)}</td>
-            <td>${item.Name || 'N/A'}</td>
+            <td>${item.Name || 'N/A'}${dupBadge}</td>
             <td>${item.Email || 'N/A'}</td>
             <td>${item['Quiz Title'] || 'N/A'}</td>
             <td>${item.Wave || 'N/A'}</td>
@@ -849,51 +909,62 @@
       tbody.innerHTML = rows.join('');
     }
 
-    // ── Question error stats ──────────────────────────────────────────────────
+    // ── Duplicate toggle ──────────────────────────────────────────────────────
+    function toggleDuplicates() {
+      hidingDuplicates = !hidingDuplicates;
+      const btn = document.getElementById('dupToggleBtn');
+      if (hidingDuplicates) {
+        btn.textContent = '⧉ Show Duplicates';
+        btn.classList.remove('secondary');
+        btn.classList.add('dup-active');
+      } else {
+        btn.textContent = '⧉ Hide Duplicates';
+        btn.classList.remove('dup-active');
+        btn.classList.add('secondary');
+      }
+      applyFilters();
+    }
 
+    // ── Question error stats ──────────────────────────────────────────────────
     async function updateQuestionStats() {
-      const titleFilter     = document.getElementById('titleFilter').value;
-      const statsDiv        = document.getElementById('questionStats');
-      const statsGrid       = document.getElementById('questionStatsGrid');
+      const titleFilter = document.getElementById('titleFilter').value;
+      const statsDiv    = document.getElementById('questionStats');
+      const statsGrid   = document.getElementById('questionStatsGrid');
 
       if (!titleFilter) { statsDiv.style.display = 'none'; return; }
 
       statsDiv.style.display = 'block';
-      statsGrid.innerHTML    = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:20px">Calculating…</div>';
+      statsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:20px">Calculating…</div>';
 
       try {
         const { byId, byIndex } = await fetchQuestionData(titleFilter);
-        const allEntries         = Object.values(byIndex); // sorted by sheetIndex
+        const allEntries        = Object.values(byIndex);
 
         if (!allEntries.length) {
           statsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:20px">No questions found</div>';
           return;
         }
 
-        // errorCount[id] and wrongLetterFreq[id][letter]
-        const errorCount     = {};
+        const errorCount      = {};
         const wrongLetterFreq = {};
         allEntries.forEach(e => {
           errorCount[e.id]      = 0;
           wrongLetterFreq[e.id] = {};
         });
 
-        // Tally errors across filtered responses
         for (const item of filteredData) {
           if (item['Quiz Title'] !== titleFilter) continue;
 
-          const rawWrong   = (item['Wrong answers'] || item['Wrong Answers'] || '').trim();
+          const rawWrong = (item['Wrong answers'] || item['Wrong Answers'] || '').trim();
           if (!rawWrong) continue;
 
-          const wrongIds   = parseWrongAnswerIds(rawWrong);
+          const wrongIds    = parseWrongAnswerIds(rawWrong);
           const userAnswers = parseAnswers(item.Answers || '');
 
           wrongIds.forEach(id => {
-            if (errorCount[id] === undefined) return;  // ID not in current question set
-
+            if (errorCount[id] === undefined) return;
             errorCount[id]++;
 
-            // Tally what wrong answer the user picked
             const qEntry     = byId[id];
             if (!qEntry) return;
             const userLetter = (userAnswers[qEntry.sheetIndex] || '').toUpperCase();
@@ -903,15 +974,14 @@
           });
         }
 
-        const counts  = Object.values(errorCount);
-        const maxErr  = Math.max(...counts, 1);
+        const counts = Object.values(errorCount);
+        const maxErr = Math.max(...counts, 1);
 
         statsGrid.innerHTML = allEntries.map(qEntry => {
           const count = errorCount[qEntry.id] || 0;
           const pct   = (count / maxErr) * 100;
           const cls   = pct > 66 ? 'high' : pct > 33 ? 'medium' : 'low';
 
-          // Most common wrong answer
           const freq  = wrongLetterFreq[qEntry.id] || {};
           let commonWrong = { letter: null, count: 0 };
           for (const [letter, cnt] of Object.entries(freq)) {
@@ -935,7 +1005,6 @@
     }
 
     // ── Filters ───────────────────────────────────────────────────────────────
-
     function populateTitleFilter(data) {
       const titles = [...new Set(data.map(d => d['Quiz Title']).filter(Boolean))];
       const sel    = document.getElementById('titleFilter');
@@ -960,9 +1029,15 @@
         });
     }
 
-    function updateStats() {
+    function updateStats(baseFiltered) {
+      // baseFiltered = filtered set BEFORE the hide-toggle strips dupes.
+      // Falls back to filteredData when called from non-filter paths.
+      const countSource = baseFiltered || filteredData;
+      const dupCount = countSource.filter(r => r._isDuplicate).length;
+
       document.getElementById('totalRecords').textContent    = allData.length;
       document.getElementById('filteredRecords').textContent = filteredData.length;
+      document.getElementById('dupRecords').textContent      = dupCount;
 
       if (filteredData.length) {
         const avg = filteredData.reduce((sum, item) => {
@@ -985,7 +1060,9 @@
       const end   = document.getElementById('endDate').value;
       const email = document.getElementById('emailFilter').value.toLowerCase().trim();
 
-      filteredData = allData.filter(item => {
+      // First: apply all user filters WITHOUT the hide-duplicate toggle.
+      // This gives us the true filtered set to count dupes from.
+      const baseFiltered = allData.filter(item => {
         if (title && item['Quiz Title'] !== title) return false;
         if (wave  && item.Wave          !== wave)  return false;
         if (email && !(item.Email || '').toLowerCase().includes(email)) return false;
@@ -997,16 +1074,27 @@
         return true;
       });
 
+      // filteredData is what the table and stats see.
+      // If hiding, strip dupes for display — but dupCount is read from baseFiltered.
+      filteredData = hidingDuplicates
+        ? baseFiltered.filter(item => !item._isDuplicate)
+        : baseFiltered;
+
       renderTable(filteredData);
-      updateStats();
+
+      // Pass baseFiltered so dupCount is always accurate regardless of toggle state.
+      updateStats(baseFiltered);
     }
 
     function clearFilters() {
       ['titleFilter','waveFilter','startDate','endDate','emailFilter']
         .forEach(id => { document.getElementById(id).value = ''; });
-      filteredData = [...allData];
+      const baseFiltered = [...allData];
+      filteredData = hidingDuplicates
+        ? baseFiltered.filter(r => !r._isDuplicate)
+        : baseFiltered;
       renderTable(filteredData);
-      updateStats();
+      updateStats(baseFiltered);
     }
 
     async function downloadCSV() {
@@ -1015,7 +1103,7 @@
       const headers = [
         'Timestamp','Name','Email','Quiz Title','Wave',
         'Score','Total Score','Answers','Wrong Answers',
-        'Duration (seconds)','Submission Time','Mobile'
+        'Duration (seconds)','Submission Time','Mobile','Is Duplicate'
       ];
 
       const rows = filteredData.map(item => [
@@ -1030,7 +1118,8 @@
         item['Wrong answers'] || item['Wrong Answers'] || '',
         parseInt(item.Duration) || 0,
         item['Time of Submission'] || '',
-        item.Mobile || ''
+        item.Mobile || '',
+        item._isDuplicate ? 'YES' : 'NO'
       ]);
 
       const escape = cell => {
@@ -1049,7 +1138,6 @@
     }
 
     // ── Boot ──────────────────────────────────────────────────────────────────
-
     async function loadData() {
       try {
         const res  = await fetch(RESPONSES_URL);
@@ -1061,11 +1149,12 @@
           return;
         }
 
-        allData      = data;
-        filteredData = [...data];
+        // Mark duplicates on raw data before anything else
+        allData      = markDuplicates(data);
+        filteredData = [...allData];
 
-        populateTitleFilter(data);
-        populateWaveFilter(data);
+        populateTitleFilter(allData);
+        populateWaveFilter(allData);
         renderTable(filteredData);
         updateStats();
 
