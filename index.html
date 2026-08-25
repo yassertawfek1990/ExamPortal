@@ -439,6 +439,68 @@
       60%,100%{ content: '...'; }
     }
 
+    /* ── Compare panel ── */
+    .compare-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 30px;
+      animation: fadeIn 0.9s ease-out 0.3s both;
+    }
+
+    .compare-panel h2 {
+      font-size: 1.15rem;
+      color: var(--accent-orange);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .compare-panel .compare-desc {
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+    }
+
+    .compare-columns {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .compare-side {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+
+    .compare-side-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    .compare-side .filter-group { margin-bottom: 12px; }
+    .compare-side .filter-group:last-child { margin-bottom: 0; }
+
+    #compareResultsContainer { margin-top: 20px; }
+
+    #compareResultsContainer .compare-summary {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-bottom: 12px;
+    }
+
+    #compareResultsContainer .compare-summary span { color: var(--accent-cyan); font-weight: 600; }
+
     @media (max-width: 768px) {
       h1 { font-size: 1.8rem; }
       .filters { grid-template-columns: 1fr; }
@@ -446,6 +508,7 @@
       table { font-size: 0.8rem; }
       th, td { padding: 10px 8px; }
       .hamburger { display: flex; }
+      .compare-columns { grid-template-columns: 1fr; }
 
       .nav-links {
         position: fixed;
@@ -535,6 +598,62 @@
       </div>
     </div>
 
+    <div class="compare-panel">
+      <h2>Compare Two Exams (Pre / Post)</h2>
+      <p class="compare-desc">Match students by email across two exam sittings and see both scores side by side, with a normalized gain score.</p>
+
+      <div class="compare-columns">
+        <div class="compare-side">
+          <div class="compare-side-label">Exam A (earlier)</div>
+          <div class="filter-group">
+            <label for="compareTitleA">Title</label>
+            <select id="compareTitleA"><option value="">Select title…</option></select>
+          </div>
+          <div class="filter-group">
+            <label for="compareDateA">Date</label>
+            <input type="date" id="compareDateA" />
+          </div>
+        </div>
+        <div class="compare-side">
+          <div class="compare-side-label">Exam B (later)</div>
+          <div class="filter-group">
+            <label for="compareTitleB">Title</label>
+            <select id="compareTitleB"><option value="">Select title…</option></select>
+          </div>
+          <div class="filter-group">
+            <label for="compareDateB">Date</label>
+            <input type="date" id="compareDateB" />
+          </div>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="runComparison()">⇄ Compare</button>
+        <button class="secondary" onclick="clearComparison()">Clear</button>
+        <button class="secondary" onclick="downloadCompareCSV()">⬇ Download CSV</button>
+      </div>
+
+      <div id="compareResultsContainer" style="display:none;">
+        <div class="compare-summary">Matched students: <span id="compareCount">0</span></div>
+        <div class="table-container">
+          <div class="table-wrapper">
+            <table id="compareTable">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th id="compareHeadA">Exam A Score</th>
+                  <th id="compareHeadB">Exam B Score</th>
+                  <th>Normalized Gain</th>
+                </tr>
+              </thead>
+              <tbody id="compareTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="table-container">
       <div class="table-wrapper">
         <table id="resultsTable">
@@ -572,6 +691,7 @@
     let allData          = [];
     let filteredData     = [];
     let hidingDuplicates = false;
+    let lastCompareRows  = []; // for CSV export of the comparison table
 
     /*
      * Duplicate detection key:
@@ -1029,6 +1149,19 @@
         });
     }
 
+    // ── Compare panel: title dropdowns ───────────────────────────────────────
+    function populateCompareFilters(data) {
+      const titles = [...new Set(data.map(d => d['Quiz Title']).filter(Boolean))];
+      ['compareTitleA', 'compareTitleB'].forEach(id => {
+        const sel = document.getElementById(id);
+        titles.forEach(t => {
+          const o = document.createElement('option');
+          o.value = o.textContent = t;
+          sel.appendChild(o);
+        });
+      });
+    }
+
     function updateStats(baseFiltered) {
       // baseFiltered = filtered set BEFORE the hide-toggle strips dupes.
       // Falls back to filteredData when called from non-filter paths.
@@ -1137,6 +1270,164 @@
       document.body.removeChild(a);
     }
 
+    // ── Compare two exams by email ───────────────────────────────────────────
+    // Matches the SAME student (by email) between exam A (a title on a specific
+    // date) and exam B (another title on another specific date), and computes
+    // a normalized gain: (scoreB - scoreA) / (totalA - scoreA).
+    // Duplicate submissions are excluded; if a student has more than one
+    // qualifying attempt on the chosen date, the latest one is used.
+
+    function sameCalendarDate(timestamp, dateStr) {
+      if (!timestamp || !dateStr) return false;
+      const d = new Date(timestamp);
+      if (isNaN(d)) return false;
+      const y   = d.getFullYear();
+      const m   = String(d.getMonth() + 1).padStart(2, '0');
+      const day = String(d.getDate()).padStart(2, '0');
+      return `${y}-${m}-${day}` === dateStr;
+    }
+
+    function buildExamEmailMap(title, dateStr) {
+      const map = {};
+      allData.forEach(item => {
+        if (item._isDuplicate) return;
+        if ((item['Quiz Title'] || '') !== title) return;
+        if (!sameCalendarDate(item.Timestamp, dateStr)) return;
+
+        const email = (item.Email || '').trim().toLowerCase();
+        if (!email) return;
+
+        // Keep the latest attempt for that student on that date.
+        if (!map[email] || new Date(item.Timestamp) > new Date(map[email].Timestamp)) {
+          map[email] = item;
+        }
+      });
+      return map;
+    }
+
+    function computeNormalizedGain(scoreA, totalA, scoreB) {
+      const denom = totalA - scoreA;
+      if (denom === 0) return null; // undefined: student already had a perfect score on Exam A
+      return (scoreB - scoreA) / denom;
+    }
+
+    function runComparison() {
+      const titleA = document.getElementById('compareTitleA').value;
+      const dateA  = document.getElementById('compareDateA').value;
+      const titleB = document.getElementById('compareTitleB').value;
+      const dateB  = document.getElementById('compareDateB').value;
+
+      if (!titleA || !dateA || !titleB || !dateB) {
+        alert('Please select a title and a date for both Exam A and Exam B.');
+        return;
+      }
+
+      const mapA = buildExamEmailMap(titleA, dateA);
+      const mapB = buildExamEmailMap(titleB, dateB);
+
+      const commonEmails = Object.keys(mapA).filter(email => mapB[email])
+        .sort((e1, e2) => e1.localeCompare(e2));
+
+      document.getElementById('compareHeadA').textContent = `${titleA} (${dateA})`;
+      document.getElementById('compareHeadB').textContent = `${titleB} (${dateB})`;
+
+      const resultsContainer = document.getElementById('compareResultsContainer');
+      const tbody             = document.getElementById('compareTableBody');
+      resultsContainer.style.display = 'block';
+      document.getElementById('compareCount').textContent = commonEmails.length;
+
+      if (!commonEmails.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="no-data">No students found who took both exams on the selected dates</td></tr>';
+        lastCompareRows = [];
+        return;
+      }
+
+      lastCompareRows = commonEmails.map(email => {
+        const a = mapA[email];
+        const b = mapB[email];
+
+        const scoreA = parseInt(a.Score)          || 0;
+        const totalA = parseInt(a['Total Score']) || 0;
+        const scoreB = parseInt(b.Score)          || 0;
+        const totalB = parseInt(b['Total Score']) || 0;
+
+        const gain = computeNormalizedGain(scoreA, totalA, scoreB);
+
+        return {
+          name: a.Name || b.Name || 'N/A',
+          email, scoreA, totalA, scoreB, totalB, gain
+        };
+      });
+
+      tbody.innerHTML = lastCompareRows.map(row => {
+        const { name, email, scoreA, totalA, scoreB, totalB, gain } = row;
+
+        let gainHTML;
+        if (gain === null) {
+          gainHTML = `<span style="color:var(--text-secondary)">N/A (perfect on A)</span>`;
+        } else {
+          const pct = gain * 100;
+          const cls = gain >= 0.7 ? 'score-good' : gain >= 0.3 ? 'score-medium' : 'score-low';
+          gainHTML = `<span class="score-cell ${cls}">${pct.toFixed(1)}%</span>`;
+        }
+
+        return `
+          <tr>
+            <td>${name}</td>
+            <td>${email}</td>
+            <td class="score-cell ${scoreClass(scoreA, totalA)}">${scoreA}/${totalA}</td>
+            <td class="score-cell ${scoreClass(scoreB, totalB)}">${scoreB}/${totalB}</td>
+            <td>${gainHTML}</td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function clearComparison() {
+      ['compareTitleA', 'compareDateA', 'compareTitleB', 'compareDateB']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      document.getElementById('compareResultsContainer').style.display = 'none';
+      document.getElementById('compareTableBody').innerHTML = '';
+      lastCompareRows = [];
+    }
+
+    function downloadCompareCSV() {
+      if (!lastCompareRows.length) { alert('No comparison data to download — run a comparison first'); return; }
+
+      const titleA = document.getElementById('compareTitleA').value;
+      const dateA  = document.getElementById('compareDateA').value;
+      const titleB = document.getElementById('compareTitleB').value;
+      const dateB  = document.getElementById('compareDateB').value;
+
+      const headers = [
+        'Name', 'Email',
+        `Exam A Title (${dateA})`, 'Exam A Score', 'Exam A Total',
+        `Exam B Title (${dateB})`, 'Exam B Score', 'Exam B Total',
+        'Normalized Gain'
+      ];
+
+      const rows = lastCompareRows.map(r => [
+        r.name, r.email,
+        titleA, r.scoreA, r.totalA,
+        titleB, r.scoreB, r.totalB,
+        r.gain === null ? 'N/A' : (r.gain * 100).toFixed(1) + '%'
+      ]);
+
+      const escape = cell => {
+        const s = String(cell);
+        return (s.includes(',') || s.includes('"') || s.includes('\n'))
+          ? `"${s.replace(/"/g,'""')}"` : s;
+      };
+
+      const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(escape).join(',')).join('\n');
+      const a   = document.createElement('a');
+      a.href    = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      a.download = `exam-comparison-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
     // ── Boot ──────────────────────────────────────────────────────────────────
     async function loadData() {
       try {
@@ -1155,6 +1446,7 @@
 
         populateTitleFilter(allData);
         populateWaveFilter(allData);
+        populateCompareFilters(allData);
         renderTable(filteredData);
         updateStats();
 
