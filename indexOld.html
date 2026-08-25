@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quiz Results Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg-primary:    #0a1927;
+      --bg-secondary:  #15293d;
+      --bg-card:       #1a3749;
+      --accent-cyan:   #00fff5;
+      --accent-orange: #ff6b35;
+      --text-primary:  #e8edf5;
+      --text-secondary:#8b9dc3;
+      --border:        #2a3659;
+      --success:       #00ff88;
+      --error:         #ff3366;
+      --warning:       #ffcc00;
+      --dup-bg:        rgba(255,51,102,0.07);
+      --dup-border:    rgba(255,51,102,0.35);
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, #0d1430 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 8px;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 50px 50px;
+      opacity: 0.3;
+      z-index: 0;
+      animation: gridMove 20s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0%   { transform: translate(0, 0); }
+      100% { transform: translate(50px, 50px); }
+    }
+
+    /* ── Navbar ── */
+    .navbar {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      background-color: var(--bg-card);
+      box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+      z-index: 1000;
+      padding: 10px 0;
+    }
+
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+    }
+
+    .logo {
+      display: flex; align-items: center; gap: 10px;
+      text-decoration: none; color: var(--accent-cyan);
+      font-weight: bold; font-size: 1.2rem;
+    }
+
+    .logo-icon {
+      background-color: var(--accent-cyan);
+      color: var(--bg-primary);
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: bold; font-size: 1.1rem;
+    }
+
+    .nav-links { display: flex; gap: 5px; list-style: none; }
+
+    .nav-links a {
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 12px 18px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+      font-weight: 500;
+      white-space: nowrap;
+    }
+
+    .nav-links a:hover { background-color: var(--bg-secondary); color: var(--accent-cyan); }
+    .nav-links a.active { background-color: var(--accent-cyan); color: var(--bg-primary); }
+
+    .hamburger {
+      display: none; flex-direction: column;
+      cursor: pointer; gap: 4px; padding: 10px;
+    }
+
+    .hamburger span {
+      width: 25px; height: 3px;
+      background-color: var(--text-primary);
+      border-radius: 2px; transition: 0.3s;
+    }
+
+    /* ── Layout ── */
+    .container {
+      max-width: 98vw;
+      margin: 80px auto 20px;
+      position: relative;
+    }
+
+    header { margin-bottom: 40px; animation: slideDown 0.6s ease-out; }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    h1 {
+      font-size: 2.5rem; font-weight: 700; margin-bottom: 10px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-orange));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text; letter-spacing: -1px;
+    }
+
+    .subtitle { color: var(--text-secondary); font-size: 1rem; font-family: 'JetBrains Mono', monospace; }
+
+    /* ── Controls ── */
+    .controls-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 30px;
+      animation: fadeIn 0.8s ease-out 0.2s both;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .filter-group { display: flex; flex-direction: column; gap: 8px; }
+
+    label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      font-weight: 600;
+    }
+
+    select, input[type="date"], input[type="email"] {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.3s ease;
+    }
+
+    select:focus, input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 0 3px rgba(0,255,245,0.1);
+    }
+
+    .button-group { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    button {
+      background: linear-gradient(135deg, var(--accent-cyan), #00d4cc);
+      border: none; border-radius: 6px;
+      padding: 10px 24px;
+      color: var(--bg-primary);
+      font-weight: 600; font-size: 0.9rem;
+      cursor: pointer; transition: all 0.3s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,255,245,0.3); }
+    button:active { transform: translateY(0); }
+
+    button.secondary {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    button.secondary:hover { background: var(--bg-card); box-shadow: none; }
+
+    /* ── Duplicate toggle button states ── */
+    button.dup-active {
+      background: var(--bg-secondary);
+      color: var(--error);
+      border: 1px solid var(--error);
+      box-shadow: 0 0 10px rgba(255,51,102,0.2);
+    }
+
+    button.dup-active:hover {
+      background: rgba(255,51,102,0.1);
+      box-shadow: 0 4px 16px rgba(255,51,102,0.3);
+    }
+
+    .stats {
+      display: flex; gap: 20px;
+      padding: 16px 0;
+      border-top: 1px solid var(--border);
+      margin-top: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .stat-item { color: var(--text-secondary); }
+    .stat-value { color: var(--accent-cyan); font-weight: 600; margin-left: 6px; }
+    .stat-value.dup-stat { color: var(--error); }
+
+    /* ── Question stats ── */
+    .question-stats {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border);
+    }
+
+    .question-stats-header {
+      color: var(--accent-orange);
+      font-size: 0.9rem; font-weight: 600;
+      margin-bottom: 12px;
+      text-transform: uppercase; letter-spacing: 1px;
+    }
+
+    .question-stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 8px;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .question-stat-item {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      cursor: help;
+      transition: all 0.3s ease;
+    }
+
+    .question-stat-item:hover {
+      border-color: var(--accent-cyan);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,255,245,0.2);
+    }
+
+    .question-stat-number { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; }
+    .question-stat-count  { font-size: 1.1rem; font-weight: 700; }
+    .question-stat-count.low    { color: var(--success); }
+    .question-stat-count.medium { color: var(--accent-orange); }
+    .question-stat-count.high   { color: var(--error); }
+
+    /* ── Table ── */
+    .table-container {
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: visible;
+      animation: fadeIn 1s ease-out 0.4s both;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: 12px;
+      background: var(--bg-card);
+    }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+
+    thead { background: var(--bg-secondary); }
+
+    th {
+      padding: 16px 12px;
+      text-align: left; font-weight: 600;
+      color: var(--accent-cyan);
+      text-transform: uppercase; font-size: 0.75rem; letter-spacing: 1px;
+      border-bottom: 2px solid var(--accent-cyan);
+      white-space: nowrap;
+    }
+
+    td { padding: 8px 7px; border-bottom: 1px solid var(--border); color: var(--text-primary); }
+
+    tbody tr { transition: all 0.2s ease; }
+    tbody tr:hover { background: rgba(0,255,245,0.05); }
+
+    /* ── Duplicate row styling ── */
+    tbody tr.is-duplicate {
+      background: var(--dup-bg);
+      border-left: 3px solid var(--dup-border);
+      opacity: 0.72;
+    }
+
+    tbody tr.is-duplicate:hover {
+      background: rgba(255,51,102,0.1);
+      opacity: 0.9;
+    }
+
+    tbody tr.is-duplicate td {
+      color: var(--text-secondary);
+    }
+
+    .dup-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 7px;
+      background: rgba(255,51,102,0.15);
+      border: 1px solid var(--error);
+      border-radius: 4px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--error);
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .score-cell { font-family: 'JetBrains Mono', monospace; font-weight: 600; }
+    .score-good   { color: var(--success); }
+    .score-medium { color: var(--accent-orange); }
+    .score-low    { color: var(--error); }
+
+    .duration-cell { font-family: 'JetBrains Mono', monospace; color: var(--text-secondary); }
+
+    .mobile-badge {
+      display: inline-block; padding: 4px 8px;
+      background: var(--bg-secondary); border-radius: 4px;
+      font-size: 0.75rem; color: var(--accent-cyan);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* ── Wrong answer chips ── */
+    .wrong-list { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+
+    .wrong-chip {
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(255,51,102,0.2);
+      border: 1px solid var(--error);
+      border-radius: 3px;
+      font-size: 0.7rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--error);
+      font-weight: 600;
+      cursor: help;
+      transition: all 0.3s ease;
+    }
+
+    .wrong-chip:hover { background: rgba(255,51,102,0.4); transform: scale(1.1); }
+
+    /* ── Overlay tooltip ── */
+    .overlay-tooltip {
+      position: fixed;
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 16px;
+      border-radius: 8px;
+      border: 1px solid var(--accent-cyan);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+      max-width: 400px;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
+      z-index: 999999;
+    }
+
+    .tooltip-section {
+      margin-bottom: 12px; padding-bottom: 12px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .tooltip-section:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+
+    .tooltip-header {
+      color: var(--accent-cyan); font-weight: 600;
+      margin-bottom: 8px; font-size: 0.75rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .tooltip-question { color: var(--text-primary); margin-bottom: 8px; font-weight: 500; line-height: 1.4; }
+
+    .tooltip-row {
+      display: flex; justify-content: space-between;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem; margin-bottom: 4px;
+    }
+
+    .tooltip-label  { color: var(--text-secondary); min-width: 90px; }
+    .tooltip-val    { font-weight: 600; text-align: right; max-width: 250px; word-break: break-word; }
+    .c-correct      { color: var(--success); }
+    .c-user         { color: var(--error); }
+    .c-common-wrong { color: var(--warning); }
+    .c-freq         { color: var(--accent-orange); }
+
+    /* ── States ── */
+    .loading, .error, .no-data {
+      text-align: center; padding: 60px 20px;
+      color: var(--text-secondary); font-size: 1.1rem;
+    }
+
+    .error { color: var(--error); }
+
+    .loading::after {
+      content: '...';
+      animation: dots 1.5s steps(4, end) infinite;
+    }
+
+    @keyframes dots {
+      0%,20%  { content: '.'; }
+      40%     { content: '..'; }
+      60%,100%{ content: '...'; }
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 1.8rem; }
+      .filters { grid-template-columns: 1fr; }
+      .stats { flex-direction: column; gap: 8px; }
+      table { font-size: 0.8rem; }
+      th, td { padding: 10px 8px; }
+      .hamburger { display: flex; }
+
+      .nav-links {
+        position: fixed;
+        top: 60px; left: 0; right: 0;
+        background-color: var(--bg-card);
+        flex-direction: column;
+        padding: 20px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        transform: translateY(-100%);
+        opacity: 0; visibility: hidden;
+        transition: all 0.3s ease;
+        z-index: 999;
+      }
+
+      .nav-links.active { transform: translateY(0); opacity: 1; visibility: visible; }
+      .nav-links a { padding: 15px; text-align: center; border-radius: 6px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <div class="logo-icon">UPC</div>
+        <span>Exams Portal</span>
+      </a>
+      <div class="hamburger" id="hamburger">
+        <span></span><span></span><span></span>
+      </div>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="createExam.html">Create/Edit Exam</a></li>
+        <li><a href="OpenExam.html">Open Exam</a></li>
+        <li><a href="index.html" class="active">Results Board</a></li>
+        <li><a href="newWave.html">Add Wave</a></li>
+        <li><a href="https://upctalentmanagement.github.io/upcExams/UPC-Quiz">Take Exam</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <header>
+      <h1>Quiz Results Dashboard</h1>
+      <p class="subtitle">// Real-time analytics &amp; performance tracking</p>
+    </header>
+
+    <div class="controls-panel">
+      <div class="filters">
+        <div class="filter-group">
+          <label for="titleFilter">Quiz Title</label>
+          <select id="titleFilter"><option value="">All Titles</option></select>
+        </div>
+        <div class="filter-group">
+          <label for="waveFilter">Wave</label>
+          <select id="waveFilter"><option value="">All Waves</option></select>
+        </div>
+        <div class="filter-group">
+          <label for="startDate">Start Date</label>
+          <input type="date" id="startDate" />
+        </div>
+        <div class="filter-group">
+          <label for="endDate">End Date</label>
+          <input type="date" id="endDate" />
+        </div>
+        <div class="filter-group">
+          <label for="emailFilter">Search Email</label>
+          <input type="email" id="emailFilter" placeholder="user@example.com" />
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button onclick="applyFilters()">Apply Filters</button>
+        <button class="secondary" onclick="clearFilters()">Clear All</button>
+        <button class="secondary" onclick="downloadCSV()">⬇ Download CSV</button>
+        <button class="secondary" id="dupToggleBtn" onclick="toggleDuplicates()">⧉ Hide Duplicates</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">Total Records: <span class="stat-value" id="totalRecords">0</span></div>
+        <div class="stat-item">Filtered: <span class="stat-value" id="filteredRecords">0</span></div>
+        <div class="stat-item">Avg Score: <span class="stat-value" id="avgScore">0%</span></div>
+        <div class="stat-item">Duplicates: <span class="stat-value dup-stat" id="dupRecords">0</span></div>
+      </div>
+
+      <div id="questionStats" class="question-stats" style="display:none;">
+        <div class="question-stats-header">Question Error Analysis</div>
+        <div id="questionStatsGrid" class="question-stats-grid"></div>
+      </div>
+    </div>
+
+    <div class="table-container">
+      <div class="table-wrapper">
+        <table id="resultsTable">
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Quiz Title</th>
+              <th>Wave</th>
+              <th>Score</th>
+              <th>Wrong Answers</th>
+              <th>Duration</th>
+              <th>Submission Time</th>
+              <th>Mobile</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody">
+            <tr><td colspan="10" class="loading">Loading data</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Fixed tooltip layer — never clipped by overflow:hidden -->
+  <div id="tooltipLayer" style="position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999999;"></div>
+
+  <script>
+    // ── Sheet URLs ────────────────────────────────────────────────────────────
+    const RESPONSES_URL  = 'https://opensheet.elk.sh/1MgMM6m2yNeSBDDZPoD1ml0YYNabxh40l_xdAIxh1d3U/Responses';
+    const QUESTIONS_BASE = 'https://opensheet.elk.sh/1zq1ei3A6LcuUPp77WLl8hiP2MCdTHfbV2ScMF2cvzu0/';
+
+    // ── State ─────────────────────────────────────────────────────────────────
+    let allData          = [];
+    let filteredData     = [];
+    let hidingDuplicates = false;
+
+    /*
+     * Duplicate detection key:
+     *   name + email + quiz title + wave + score + mobile
+     * All six fields must match for a row to be considered a duplicate.
+     * The FIRST occurrence (earliest timestamp) is kept as original;
+     * all subsequent matches are flagged as duplicates.
+     */
+    function buildDupKey(item) {
+      return [
+        (item.Name          || '').trim().toLowerCase(),
+        (item.Email         || '').trim().toLowerCase(),
+        (item['Quiz Title'] || '').trim().toLowerCase(),
+        (item.Wave          || '').trim().toLowerCase(),
+        String(parseInt(item.Score) || 0),
+        (item.Mobile        || '').trim().toLowerCase()
+      ].join('||');
+    }
+
+    function markDuplicates(data) {
+      const seen = new Set();
+      // Data assumed to be in chronological order (Google Sheets append order).
+      // First occurrence = original; rest = duplicate.
+      return data.map(item => {
+        const key = buildDupKey(item);
+        if (seen.has(key)) {
+          return { ...item, _isDuplicate: true };
+        }
+        seen.add(key);
+        return { ...item, _isDuplicate: false };
+      });
+    }
+
+    /*
+     * questionCache[quizTitle] = {
+     *   byId:    { [id]:    { id, sheetIndex, question, correctAnswer, options } }
+     *   byIndex: { [index]: { id, sheetIndex, question, correctAnswer, options } }
+     * }
+     */
+    const questionCache = {};
+
+    // ── Mobile menu ───────────────────────────────────────────────────────────
+    const hamburger = document.getElementById('hamburger');
+    const navLinks  = document.getElementById('navLinks');
+
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navLinks.classList.toggle('active');
+    });
+
+    document.addEventListener('click', e => {
+      if (!hamburger.contains(e.target) && !navLinks.contains(e.target)) {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.nav-links a').forEach(a =>
+      a.addEventListener('click', () => {
+        hamburger.classList.remove('active');
+        navLinks.classList.remove('active');
+      })
+    );
+
+    // ── Tooltip overlay ───────────────────────────────────────────────────────
+    const tooltipLayer = document.getElementById('tooltipLayer');
+    let activeTooltip  = null;
+
+    function showTooltip(anchorEl, html) {
+      hideTooltip();
+
+      const tip = document.createElement('div');
+      tip.className = 'overlay-tooltip';
+      tip.innerHTML = html;
+      tooltipLayer.appendChild(tip);
+      activeTooltip = tip;
+
+      requestAnimationFrame(() => {
+        const ar = anchorEl.getBoundingClientRect();
+        const tr = tip.getBoundingClientRect();
+
+        let top  = ar.top - tr.height - 12;
+        let left = ar.left + ar.width / 2 - tr.width / 2;
+
+        if (top < 8) top = ar.bottom + 8;
+        left = Math.max(8, Math.min(left, window.innerWidth - tr.width - 8));
+
+        tip.style.top  = top  + 'px';
+        tip.style.left = left + 'px';
+        tip.style.opacity = '1';
+      });
+    }
+
+    function hideTooltip() {
+      if (activeTooltip) { activeTooltip.remove(); activeTooltip = null; }
+    }
+
+    document.addEventListener('mouseover', e => {
+      const chip = e.target.closest('[data-tip]');
+      if (chip) showTooltip(chip, chip.dataset.tip);
+    });
+
+    document.addEventListener('mouseout', e => {
+      if (e.target.closest('[data-tip]')) hideTooltip();
+    });
+
+    // ── Fetch & cache question data ───────────────────────────────────────────
+    async function fetchQuestionData(quizTitle) {
+      if (questionCache[quizTitle]) return questionCache[quizTitle];
+
+      try {
+        const res       = await fetch(QUESTIONS_BASE + encodeURIComponent(quizTitle));
+        const questions = await res.json();
+
+        const byId    = {};
+        const byIndex = {};
+
+        questions.forEach((q, sheetIndex) => {
+          const id = (q.ID !== undefined && q.ID !== '') ? String(q.ID) : String(sheetIndex + 1);
+
+          const entry = {
+            id,
+            sheetIndex,
+            question:      q.Question    || `Question ${sheetIndex + 1}`,
+            correctAnswer: (q.CorrectAnswer || '').trim().toUpperCase(),
+            options: {
+              A: q.OptionA || '',
+              B: q.OptionB || '',
+              C: q.OptionC || '',
+              D: q.OptionD || ''
+            }
+          };
+
+          byId[id]            = entry;
+          byIndex[sheetIndex] = entry;
+        });
+
+        questionCache[quizTitle] = { byId, byIndex };
+        return questionCache[quizTitle];
+
+      } catch (err) {
+        console.error(`fetchQuestionData error for "${quizTitle}":`, err);
+        return { byId: {}, byIndex: {} };
+      }
+    }
+
+    // ── Parse helpers ─────────────────────────────────────────────────────────
+    function parseAnswers(raw) {
+      if (!raw || !raw.trim()) return [];
+      try {
+        if (raw.startsWith('[')) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed.map(v => String(v || '').trim().toUpperCase());
+        }
+      } catch (_) {}
+      return raw.split(',').map(v => v.trim().toUpperCase()).filter(Boolean);
+    }
+
+    function parseWrongAnswerIds(raw) {
+      if (!raw || !raw.trim()) return [];
+      try {
+        if (raw.startsWith('[')) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed)) return parsed.map(v => String(v).trim()).filter(Boolean);
+        }
+      } catch (_) {}
+      return raw.split(',').map(v => v.trim()).filter(Boolean);
+    }
+
+    // ── Formatting ────────────────────────────────────────────────────────────
+    function formatDuration(seconds) {
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      return `${m}m ${s}s`;
+    }
+
+    function formatTimestamp(ts) {
+      if (!ts) return 'N/A';
+      return new Date(ts).toLocaleString('en-US', {
+        month: 'short', day: 'numeric', year: 'numeric',
+        hour: '2-digit', minute: '2-digit'
+      });
+    }
+
+    function scoreClass(score, total) {
+      const pct = total ? (score / total) * 100 : 0;
+      if (pct >= 70) return 'score-good';
+      if (pct >= 50) return 'score-medium';
+      return 'score-low';
+    }
+
+    // ── Tooltip HTML builders ─────────────────────────────────────────────────
+    function buildWrongChipTooltip(qEntry, userAnswerLetter) {
+      const correct     = qEntry.correctAnswer;
+      const correctText = qEntry.options[correct] || correct || 'N/A';
+      const userText    = userAnswerLetter
+        ? (qEntry.options[userAnswerLetter] || userAnswerLetter)
+        : 'Not answered';
+
+      return `
+        <div class="tooltip-section">
+          <div class="tooltip-header">Question (ID: ${qEntry.id})</div>
+          <div class="tooltip-question">${qEntry.question}</div>
+        </div>
+        <div class="tooltip-section">
+          <div class="tooltip-header">Your Answer</div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">${userAnswerLetter || '—'}:</span>
+            <span class="tooltip-val c-user">${userText}</span>
+          </div>
+        </div>
+        <div class="tooltip-section">
+          <div class="tooltip-header">Correct Answer</div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">${correct}:</span>
+            <span class="tooltip-val c-correct">${correctText}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    function buildStatTooltip(qEntry, errorCount, commonWrong) {
+      const correct     = qEntry.correctAnswer;
+      const correctText = qEntry.options[correct] || correct || 'N/A';
+
+      let commonWrongSection = '';
+      if (commonWrong.letter) {
+        const cwText = qEntry.options[commonWrong.letter] || commonWrong.letter;
+        commonWrongSection = `
+          <div class="tooltip-section">
+            <div class="tooltip-header">Most Common Wrong Answer</div>
+            <div class="tooltip-row">
+              <span class="tooltip-label">${commonWrong.letter}:</span>
+              <span class="tooltip-val c-common-wrong">${cwText}</span>
+            </div>
+            <div class="tooltip-row">
+              <span class="tooltip-label">Frequency:</span>
+              <span class="tooltip-val c-freq">${commonWrong.count} times</span>
+            </div>
+          </div>
+        `;
+      }
+
+      return `
+        <div class="tooltip-section">
+          <div class="tooltip-header">Question (ID: ${qEntry.id})</div>
+          <div class="tooltip-question">${qEntry.question}</div>
+        </div>
+        <div class="tooltip-section">
+          <div class="tooltip-header">Correct Answer</div>
+          <div class="tooltip-row">
+            <span class="tooltip-label">${correct}:</span>
+            <span class="tooltip-val c-correct">${correctText}</span>
+          </div>
+        </div>
+        ${commonWrongSection}
+        <div class="tooltip-section">
+          <div class="tooltip-row">
+            <span class="tooltip-label">Total Errors:</span>
+            <span class="tooltip-val c-freq">${errorCount}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    // ── Table rendering ───────────────────────────────────────────────────────
+    async function renderTable(data) {
+      const tbody = document.getElementById('tableBody');
+
+      if (!data.length) {
+        tbody.innerHTML = '<tr><td colspan="10" class="no-data">No results found</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = '<tr><td colspan="10" class="loading">Rendering results</td></tr>';
+
+      const rows = await Promise.all(data.map(async item => {
+        const score    = parseInt(item.Score)          || 0;
+        const total    = parseInt(item['Total Score']) || 0;
+        const duration = parseInt(item.Duration)       || 0;
+        const cls      = scoreClass(score, total);
+        const isDup    = item._isDuplicate === true;
+
+        let wrongHTML = '<span style="color:var(--text-secondary)">—</span>';
+
+        const rawWrong = (item['Wrong answers'] || item['Wrong Answers'] || '').trim();
+
+        if (rawWrong) {
+          const wrongIds = parseWrongAnswerIds(rawWrong);
+
+          if (wrongIds.length > 0 && item['Quiz Title']) {
+            const { byId } = await fetchQuestionData(item['Quiz Title']);
+            const userAnswers = parseAnswers(item.Answers || '');
+
+            const chips = wrongIds.map(id => {
+              const qEntry = byId[id];
+              if (!qEntry) return `<span class="wrong-chip">${id}</span>`;
+
+              const userLetter = (userAnswers[qEntry.sheetIndex] || '').toUpperCase() || null;
+              const tip = buildWrongChipTooltip(qEntry, userLetter).replace(/'/g, '&#39;');
+
+              return `<span class="wrong-chip" data-tip='${tip}'>${id}</span>`;
+            }).join('');
+
+            wrongHTML = `<div class="wrong-list">${chips}</div>`;
+
+          } else if (!rawWrong || score === total) {
+            wrongHTML = '<span style="color:var(--success)">Perfect!</span>';
+          }
+
+        } else if (score === total && total > 0) {
+          wrongHTML = '<span style="color:var(--success)">Perfect!</span>';
+        }
+
+        const dupBadge = isDup
+          ? `<span class="dup-badge" title="Exact duplicate submission — same name, email, quiz, wave, score &amp; mobile">⧉ DUP</span>`
+          : '';
+
+        return `
+          <tr class="${isDup ? 'is-duplicate' : ''}">
+            <td>${formatTimestamp(item.Timestamp)}</td>
+            <td>${item.Name || 'N/A'}${dupBadge}</td>
+            <td>${item.Email || 'N/A'}</td>
+            <td>${item['Quiz Title'] || 'N/A'}</td>
+            <td>${item.Wave || 'N/A'}</td>
+            <td class="score-cell ${cls}">${score}/${total}</td>
+            <td>${wrongHTML}</td>
+            <td class="duration-cell">${formatDuration(duration)}</td>
+            <td>${formatTimestamp(item['Time of Submission'])}</td>
+            <td>${item.Mobile ? `<span class="mobile-badge">${item.Mobile}</span>` : 'N/A'}</td>
+          </tr>
+        `;
+      }));
+
+      tbody.innerHTML = rows.join('');
+    }
+
+    // ── Duplicate toggle ──────────────────────────────────────────────────────
+    function toggleDuplicates() {
+      hidingDuplicates = !hidingDuplicates;
+      const btn = document.getElementById('dupToggleBtn');
+      if (hidingDuplicates) {
+        btn.textContent = '⧉ Show Duplicates';
+        btn.classList.remove('secondary');
+        btn.classList.add('dup-active');
+      } else {
+        btn.textContent = '⧉ Hide Duplicates';
+        btn.classList.remove('dup-active');
+        btn.classList.add('secondary');
+      }
+      applyFilters();
+    }
+
+    // ── Question error stats ──────────────────────────────────────────────────
+    async function updateQuestionStats() {
+      const titleFilter = document.getElementById('titleFilter').value;
+      const statsDiv    = document.getElementById('questionStats');
+      const statsGrid   = document.getElementById('questionStatsGrid');
+
+      if (!titleFilter) { statsDiv.style.display = 'none'; return; }
+
+      statsDiv.style.display = 'block';
+      statsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:20px">Calculating…</div>';
+
+      try {
+        const { byId, byIndex } = await fetchQuestionData(titleFilter);
+        const allEntries        = Object.values(byIndex);
+
+        if (!allEntries.length) {
+          statsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--text-secondary);padding:20px">No questions found</div>';
+          return;
+        }
+
+        const errorCount      = {};
+        const wrongLetterFreq = {};
+        allEntries.forEach(e => {
+          errorCount[e.id]      = 0;
+          wrongLetterFreq[e.id] = {};
+        });
+
+        for (const item of filteredData) {
+          if (item['Quiz Title'] !== titleFilter) continue;
+
+          const rawWrong = (item['Wrong answers'] || item['Wrong Answers'] || '').trim();
+          if (!rawWrong) continue;
+
+          const wrongIds    = parseWrongAnswerIds(rawWrong);
+          const userAnswers = parseAnswers(item.Answers || '');
+
+          wrongIds.forEach(id => {
+            if (errorCount[id] === undefined) return;
+            errorCount[id]++;
+
+            const qEntry     = byId[id];
+            if (!qEntry) return;
+            const userLetter = (userAnswers[qEntry.sheetIndex] || '').toUpperCase();
+            if (userLetter && userLetter !== '0') {
+              wrongLetterFreq[id][userLetter] = (wrongLetterFreq[id][userLetter] || 0) + 1;
+            }
+          });
+        }
+
+        const counts = Object.values(errorCount);
+        const maxErr = Math.max(...counts, 1);
+
+        statsGrid.innerHTML = allEntries.map(qEntry => {
+          const count = errorCount[qEntry.id] || 0;
+          const pct   = (count / maxErr) * 100;
+          const cls   = pct > 66 ? 'high' : pct > 33 ? 'medium' : 'low';
+
+          const freq  = wrongLetterFreq[qEntry.id] || {};
+          let commonWrong = { letter: null, count: 0 };
+          for (const [letter, cnt] of Object.entries(freq)) {
+            if (cnt > commonWrong.count) commonWrong = { letter, count: cnt };
+          }
+
+          const tip = buildStatTooltip(qEntry, count, commonWrong).replace(/'/g, '&#39;');
+
+          return `
+            <div class="question-stat-item" data-tip='${tip}'>
+              <div class="question-stat-number">Q${qEntry.id}</div>
+              <div class="question-stat-count ${cls}">${count}</div>
+            </div>
+          `;
+        }).join('');
+
+      } catch (err) {
+        console.error('updateQuestionStats error:', err);
+        statsGrid.innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--error);padding:20px">Error calculating stats</div>';
+      }
+    }
+
+    // ── Filters ───────────────────────────────────────────────────────────────
+    function populateTitleFilter(data) {
+      const titles = [...new Set(data.map(d => d['Quiz Title']).filter(Boolean))];
+      const sel    = document.getElementById('titleFilter');
+      titles.forEach(t => {
+        const o = document.createElement('option');
+        o.value = o.textContent = t;
+        sel.appendChild(o);
+      });
+    }
+
+    function populateWaveFilter(data) {
+      const waves = [...new Set(data.map(d => d.Wave).filter(Boolean))];
+      const sel   = document.getElementById('waveFilter');
+      while (sel.options.length > 1) sel.remove(1);
+
+      waves
+        .sort((a, b) => (parseInt(a.replace(/\D/g,'')) || 0) - (parseInt(b.replace(/\D/g,'')) || 0))
+        .forEach(w => {
+          const o = document.createElement('option');
+          o.value = o.textContent = w;
+          sel.appendChild(o);
+        });
+    }
+
+    function updateStats(baseFiltered) {
+      // baseFiltered = filtered set BEFORE the hide-toggle strips dupes.
+      // Falls back to filteredData when called from non-filter paths.
+      const countSource = baseFiltered || filteredData;
+      const dupCount = countSource.filter(r => r._isDuplicate).length;
+
+      document.getElementById('totalRecords').textContent    = allData.length;
+      document.getElementById('filteredRecords').textContent = filteredData.length;
+      document.getElementById('dupRecords').textContent      = dupCount;
+
+      if (filteredData.length) {
+        const avg = filteredData.reduce((sum, item) => {
+          const s = parseInt(item.Score)          || 0;
+          const t = parseInt(item['Total Score']) || 1;
+          return sum + (s / t * 100);
+        }, 0) / filteredData.length;
+        document.getElementById('avgScore').textContent = avg.toFixed(1) + '%';
+      } else {
+        document.getElementById('avgScore').textContent = '0%';
+      }
+
+      updateQuestionStats();
+    }
+
+    function applyFilters() {
+      const title = document.getElementById('titleFilter').value;
+      const wave  = document.getElementById('waveFilter').value;
+      const start = document.getElementById('startDate').value;
+      const end   = document.getElementById('endDate').value;
+      const email = document.getElementById('emailFilter').value.toLowerCase().trim();
+
+      // First: apply all user filters WITHOUT the hide-duplicate toggle.
+      // This gives us the true filtered set to count dupes from.
+      const baseFiltered = allData.filter(item => {
+        if (title && item['Quiz Title'] !== title) return false;
+        if (wave  && item.Wave          !== wave)  return false;
+        if (email && !(item.Email || '').toLowerCase().includes(email)) return false;
+        if (start || end) {
+          const d = new Date(item.Timestamp);
+          if (start && d < new Date(start)) return false;
+          if (end   && d > new Date(end + 'T23:59:59')) return false;
+        }
+        return true;
+      });
+
+      // filteredData is what the table and stats see.
+      // If hiding, strip dupes for display — but dupCount is read from baseFiltered.
+      filteredData = hidingDuplicates
+        ? baseFiltered.filter(item => !item._isDuplicate)
+        : baseFiltered;
+
+      renderTable(filteredData);
+
+      // Pass baseFiltered so dupCount is always accurate regardless of toggle state.
+      updateStats(baseFiltered);
+    }
+
+    function clearFilters() {
+      ['titleFilter','waveFilter','startDate','endDate','emailFilter']
+        .forEach(id => { document.getElementById(id).value = ''; });
+      const baseFiltered = [...allData];
+      filteredData = hidingDuplicates
+        ? baseFiltered.filter(r => !r._isDuplicate)
+        : baseFiltered;
+      renderTable(filteredData);
+      updateStats(baseFiltered);
+    }
+
+    async function downloadCSV() {
+      if (!filteredData.length) { alert('No data to download'); return; }
+
+      const headers = [
+        'Timestamp','Name','Email','Quiz Title','Wave',
+        'Score','Total Score','Answers','Wrong Answers',
+        'Duration (seconds)','Submission Time','Mobile','Is Duplicate'
+      ];
+
+      const rows = filteredData.map(item => [
+        item.Timestamp || '',
+        item.Name || '',
+        item.Email || '',
+        item['Quiz Title'] || '',
+        item.Wave || '',
+        parseInt(item.Score) || 0,
+        parseInt(item['Total Score']) || 0,
+        item.Answers || '',
+        item['Wrong answers'] || item['Wrong Answers'] || '',
+        parseInt(item.Duration) || 0,
+        item['Time of Submission'] || '',
+        item.Mobile || '',
+        item._isDuplicate ? 'YES' : 'NO'
+      ]);
+
+      const escape = cell => {
+        const s = String(cell);
+        return (s.includes(',') || s.includes('"') || s.includes('\n'))
+          ? `"${s.replace(/"/g,'""')}"` : s;
+      };
+
+      const csv = '\uFEFF' + [headers, ...rows].map(r => r.map(escape).join(',')).join('\n');
+      const a   = document.createElement('a');
+      a.href    = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
+      a.download = `quiz-results-${new Date().toISOString().slice(0,10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
+    // ── Boot ──────────────────────────────────────────────────────────────────
+    async function loadData() {
+      try {
+        const res  = await fetch(RESPONSES_URL);
+        const data = await res.json();
+
+        if (!data || !data.length) {
+          document.getElementById('tableBody').innerHTML =
+            '<tr><td colspan="10" class="error">No data available</td></tr>';
+          return;
+        }
+
+        // Mark duplicates on raw data before anything else
+        allData      = markDuplicates(data);
+        filteredData = [...allData];
+
+        populateTitleFilter(allData);
+        populateWaveFilter(allData);
+        renderTable(filteredData);
+        updateStats();
+
+      } catch (err) {
+        console.error('loadData error:', err);
+        document.getElementById('tableBody').innerHTML =
+          '<tr><td colspan="10" class="error">Error loading data. Please try again.</td></tr>';
+      }
+    }
+
+    loadData();
+
+    // Real-time filter listeners
+    ['emailFilter','waveFilter','titleFilter','startDate','endDate']
+      .forEach(id => {
+        const el = document.getElementById(id);
+        el.addEventListener(el.tagName === 'SELECT' ? 'change' : 'input', applyFilters);
+      });
+  </script>
+</body>
+</html>
